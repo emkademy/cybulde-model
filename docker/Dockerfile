@@ -26,7 +26,7 @@ RUN addgroup --system --gid ${USER_ID} ${USER_NAME} \
     && useradd --system -m --no-log-init --home-dir ${HOME} --uid ${USER_ID} --gid ${USER_NAME} --groups ${USER_NAME} ${USER_NAME}
 
 RUN chown -R ${USER_NAME}:${USER_NAME} ${HOME}
-RUN mkdir -p /app && chown -R ${USER_NAME}:${USER_NAME} /app /tmp
+RUN mkdir -p /app /mlflow-artifact-store && chown -R ${USER_NAME}:${USER_NAME} /app /tmp /mlflow-artifact-store
 
 RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.4.2
 

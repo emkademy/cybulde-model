@@ -1,23 +1,51 @@
 version: "3.8"
 
-services:
-  app:
-    user: "${USER_ID:-1000}"
-    hostname: "${HOST_NAME:-emkademy}"
-    image: cybulde-model
-    container_name: cybulde-model-container
-    build:
-      context: .
-      dockerfile: ./docker/Dockerfile
-      args:
-        USER_NAME: "${USER_NAME:-kyuksel}"
-        USER_ID: "${USER_ID:-1000}"
-    volumes:
-      - ./:/app/
-      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
-    ports:
-      - 8080:8080
+volumes:
+  postgresql-mlflow-data:
+  mlflow-artifact-store:
 
+x-app-template: &APP_TEMPLATE
+  user: "${USER_ID:-1000}"
+  hostname: "${HOST_NAME:-emkademy}"
+  image: cybulde-model
+  build:
+    context: .
+    dockerfile: ./docker/Dockerfile
+    args:
+      USER_NAME: "${USER_NAME:-kyuksel}"
+      USER_ID: "${USER_ID:-1000}"
+  env_file:
+    - .envs/.postgres
+    - .envs/.mlflow-common
+    - .envs/.mlflow-dev
+  volumes:
+    - ./:/app/
+    - mlflow-artifact-store:/mlflow-artifact-store
+    - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+  ipc: host
+  init: true
+
+services:
+  mlflow-db:
+    container_name: mlflow-backend-store
+    image: postgres:14
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+      - .envs/.postgres
+    volumes:
+      - postgresql-mlflow-data:/var/lib/postgreql/data
+    ports:
+      - 5433:5432
+    profiles:
+      - dev
+
+  app-dev:
+    <<: *APP_TEMPLATE
+    container_name: cybulde-model-dev-container
+    ports:
+      - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
+      - 8080:8080
     deploy:
       resources:
         reservations:
@@ -25,7 +53,24 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
-    ipc: host
-    init: true
+    profiles:
+      - dev
 
+  app-prod:
+    <<: *APP_TEMPLATE
+    container_name: cybulde-model-prod-container
+    env_file:
+      - .envs/.mlflow-common
+      - .envs/.mlflow-prod
+    ports:
+      - ${PROD_MLFLOW_SERVER_PORT}:${PROD_MLFLOW_SERVER_PORT}
+    profiles:
+      - prod
 
+  app-ci:
+    <<: *APP_TEMPLATE
+    container_name: cybulde-model-ci-container
+    ports:
+      - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
+    profiles:
+      - ci
