@@ -66,3 +66,13 @@ def copy_dir(source_dir: str, target_dir: str) -> None:
                 target.write(content)
         else:
             raise ValueError(f"Source file {source_file} is not a file.")
+
+
+def translate_gcs_dir_to_local(path: str) -> str:
+    if path.startswith(GCS_PREFIX):
+        path = path.rstrip("/")
+        local_path = os.path.join(TMP_FILE_PATH, os.path.split(path)[-1])
+        os.makedirs(local_path, exist_ok=True)
+        copy_dir(path, local_path)
+        return local_path
+    return path
