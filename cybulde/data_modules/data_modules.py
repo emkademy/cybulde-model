@@ -1,8 +1,8 @@
 from typing import Any, Callable, Optional
-from lightning.pytorch import LightningDataModule
-from torch.utils.data import BatchSampler, DataLoader, Dataset, Sampler, default_collate
 
+from lightning.pytorch import LightningDataModule
 from torch import Tensor
+from torch.utils.data import BatchSampler, DataLoader, Dataset, Sampler, default_collate
 from transformers import BatchEncoding
 
 from cybulde.data_modules.datasets import TextClassificationDataset
@@ -67,7 +67,6 @@ class TextClassificationDataModule(DataModule):
         drop_last: bool = False,
         persistent_workers: bool = False,
     ) -> None:
-
         def tokenization_collate_fn(batch: list[tuple[str, int]]) -> tuple[BatchEncoding, Tensor]:
             texts, labels = default_collate(batch)
             encodings = transformation(texts)
@@ -94,11 +93,17 @@ class TextClassificationDataModule(DataModule):
 
     def setup(self, stage: Optional[str] = None) -> None:
         if stage == "fit" or stage is None:
-            self.train_dataset = TextClassificationDataset(self.train_df_path, self.text_column_name, self.label_column_name)
-            self.dev_dataset = TextClassificationDataset(self.dev_df_path, self.text_column_name, self.label_column_name)
+            self.train_dataset = TextClassificationDataset(
+                self.train_df_path, self.text_column_name, self.label_column_name
+            )
+            self.dev_dataset = TextClassificationDataset(
+                self.dev_df_path, self.text_column_name, self.label_column_name
+            )
 
         if stage == "test":
-            self.test_dataset = TextClassificationDataset(self.test_df_path, self.text_column_name, self.label_column_name)
+            self.test_dataset = TextClassificationDataset(
+                self.test_df_path, self.text_column_name, self.label_column_name
+            )
 
     def train_dataloader(self) -> DataLoader:
         return self.initialize_dataloader(self.train_dataset, is_test=False)

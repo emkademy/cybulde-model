@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from hydra.core.config_store import ConfigStore
-
 from omegaconf import MISSING
 
 from cybulde.config_schemas import transformations_schemas
@@ -31,11 +30,11 @@ class TextClassificationDataModuleConfig(DataModuleConfig):
 
 
 def setup_config() -> None:
-    transformations_schemas.setup_config() 
+    transformations_schemas.setup_config()
 
     cs = ConfigStore.instance()
     cs.store(
         name="text_classification_data_module_schema",
         group="tasks/data_module",
-        node=TextClassificationDataModuleConfig
+        node=TextClassificationDataModuleConfig,
     )

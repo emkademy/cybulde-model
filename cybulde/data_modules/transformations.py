@@ -1,5 +1,6 @@
-from abc import ABC, abstractmethod
 import os
+
+from abc import ABC, abstractmethod
 
 from transformers import AutoTokenizer, BatchEncoding, PreTrainedTokenizerBase
 
@@ -20,11 +21,7 @@ class HuggingFaceTokenizationTransformation(Transformation):
 
     def __call__(self, texts: list[str]) -> BatchEncoding:
         output: BatchEncoding = self.tokenizer.batch_encode_plus(
-            texts,
-            truncation=True,
-            padding=True,
-            return_tensors="pt",
-            max_length=self.max_sequence_length
+            texts, truncation=True, padding=True, return_tensors="pt", max_length=self.max_sequence_length
         )
         return output
 

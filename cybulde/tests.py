@@ -1,8 +1,6 @@
 from cybulde.data_modules.transformations import HuggingFaceTokenizationTransformation
 from cybulde.models.backbones import HuggingFaceBackbone
 
-
-
 pretrained_tokenizer_name_or_path = "gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer"
 max_sequence_length = 72
 

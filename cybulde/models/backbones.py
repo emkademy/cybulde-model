@@ -1,7 +1,6 @@
-
 from torch import nn
 from transformers import AutoConfig, AutoModel, BatchEncoding
-from transformers.modeling_outputs import BaseModelOutput
+from transformers.modeling_outputs import BaseModelOutputWithPooling
 
 from cybulde.utils.io_utils import translate_gcs_dir_to_local
 
@@ -15,8 +14,8 @@ class HuggingFaceBackbone(Backbone):
         super().__init__()
         self.backbone = self.get_backbone(pretrained_model_name_or_path, pretrained)
 
-    def forward(self, encodings: BatchEncoding) -> BaseModelOutput:
-        output: BaseModelOutput = self.backbone(**encodings)
+    def forward(self, encodings: BatchEncoding) -> BaseModelOutputWithPooling:
+        output: BaseModelOutputWithPooling = self.backbone(**encodings)
         return output
 
     def get_backbone(self, pretrained_model_name_or_path: str, pretrained: bool) -> nn.Module:
