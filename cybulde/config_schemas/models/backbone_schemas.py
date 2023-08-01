@@ -3,10 +3,13 @@ from dataclasses import dataclass
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
+from cybulde.config_schemas.transformations_schemas import TransformationConfig
+
 
 @dataclass
 class BackboneConfig:
     _target_: str = MISSING
+    transformation: TransformationConfig = MISSING
 
 
 @dataclass

@@ -5,6 +5,7 @@ from lightning.pytorch import LightningModule
 from torch import Tensor
 from torch.optim import Optimizer
 
+from cybulde.data_modules.transformations import Transformation
 from cybulde.models.models import Model
 from cybulde.training.loss_functions import LossFunction
 from cybulde.training.schedulers import LightningScheduler
@@ -46,5 +47,9 @@ class TrainingLightningModule(LightningModule):
         ...
 
     @abstractmethod
-    def valdation_step(self, batch: Any, batch_idx: int) -> Tensor:
+    def validation_step(self, batch: Any, batch_idx: int) -> Tensor:
+        ...
+
+    @abstractmethod
+    def get_transformation(self) -> Transformation:
         ...

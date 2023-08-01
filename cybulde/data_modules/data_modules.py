@@ -1,4 +1,4 @@
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Protocol
 
 from lightning.pytorch import LightningDataModule
 from torch import Tensor
@@ -47,6 +47,11 @@ class DataModule(LightningDataModule):
             drop_last=self.drop_last,
             persistent_workers=self.persistent_workers,
         )
+
+
+class PartialDataModule(Protocol):
+    def __call__(self, transformation: HuggingFaceTokenizationTransformation) -> DataModule:
+        ...
 
 
 class TextClassificationDataModule(DataModule):
