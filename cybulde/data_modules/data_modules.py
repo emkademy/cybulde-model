@@ -6,7 +6,7 @@ from torch.utils.data import BatchSampler, DataLoader, Dataset, Sampler, default
 from transformers import BatchEncoding
 
 from cybulde.data_modules.datasets import TextClassificationDataset
-from cybulde.data_modules.transformations import HuggingFaceTokenizationTransformation
+from cybulde.models.transformations import HuggingFaceTokenizationTransformation, Transformation
 
 
 class DataModule(LightningDataModule):
@@ -50,7 +50,7 @@ class DataModule(LightningDataModule):
 
 
 class PartialDataModule(Protocol):
-    def __call__(self, transformation: HuggingFaceTokenizationTransformation) -> DataModule:
+    def __call__(self, transformation: Transformation) -> DataModule:
         ...
 
 

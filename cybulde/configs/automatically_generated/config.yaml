@@ -2,7 +2,7 @@
 # If you want to modify configuration, edit source files in cybulde/configs directory.
 
 defaults:
-  - config_schema
+  # - config_schema
 
   - override hydra/job_logging: custom
   - override hydra/hydra_logging: disabled
@@ -21,8 +21,276 @@ infrastructure:
     mlflow_internal_tracking_uri: http://127.0.0.1:6101
     experiment_name: Default
     run_name: null
-    run_id: d1497fb3613245d4a371ab8d67e8cc6c
+    run_id: c6282b552628486eaf420045a3332d93
     experiment_id: '0'
-    experiment_url: http://127.0.0.1:6101/#/experiments/None/runs/None
-    artifact_uri: /mlflow-artifact-store/0/d1497fb3613245d4a371ab8d67e8cc6c/artifacts
-    block_mlflow: false
+    experiment_url: http://127.0.0.1:6101/#/experiments/0/runs/c6282b552628486eaf420045a3332d93
+    artifact_uri: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts
+save_last_checkpoint_every_n_train_steps: 500
+seed: 1234
+tasks:
+  binary_text_classification_task:
+    _target_: cybulde.training.tasks.tar_model_exporting_training_task.TarModelExportingTrainingTask
+    name: binary_text_classfication_task
+    data_module:
+      _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
+      batch_size: 64
+      shuffle: false
+      num_workers: 8
+      pin_memory: true
+      drop_last: true
+      persistent_workers: false
+      train_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/train.parquet
+      dev_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/dev.parquet
+      test_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/test.parquet
+      transformation:
+        _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
+        pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
+        max_sequence_length: 100
+      text_column_name: cleaned_text
+      label_column_name: label
+    lightning_module:
+      _target_: cybulde.training.lightning_modules.binary_text_classification.BinaryTextClassificationTrainingLightningModule
+      model:
+        _target_: cybulde.models.models.BinaryTextClassificationModel
+        backbone:
+          _target_: cybulde.models.backbones.HuggingFaceBackbone
+          transformation:
+            _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
+            pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
+            max_sequence_length: 100
+          pretrained_model_name_or_path: prajjwal1/bert-tiny
+          pretrained: false
+        adapter:
+          _target_: cybulde.models.adapters.MLPWithPooling
+          output_feature_sizes:
+          - -1
+          biases: null
+          activation_fns: null
+          dropout_drop_probs: null
+          batch_norms: null
+          order: LABDN
+          standardize_input: true
+          pooling_method: null
+          output_attribute_to_use: pooler_output
+        head:
+          _target_: cybulde.models.heads.SigmoidHead
+          in_features: 128
+          out_features: 1
+      loss:
+        _target_: cybulde.training.loss_functions.BCEWithLogitsLoss
+        reduction: mean
+      optimizer:
+        _target_: torch.optim.AdamW
+        _partial_: true
+        lr: 0.005
+        betas:
+        - 0.9
+        - 0.999
+        eps: 1.0e-08
+        weight_decay: 0.0
+        amsgrad: false
+        foreach: null
+        maximize: false
+        capturable: false
+      scheduler:
+        _target_: cybulde.training.schedulers.CommonLightningScheduler
+        scheduler:
+          _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
+          _partial_: true
+          mode: max
+          factor: 0.1
+          patience: 5
+          threshold: 0.0001
+          threshold_mode: rel
+          cooldown: 0
+          min_lr: 0.0
+          eps: 1.0e-08
+          verbose: false
+        interval: epoch
+        frequency: 1
+        monitor: validation_f1_score
+        strict: true
+        name: null
+    trainer:
+      _target_: lightning.pytorch.trainer.trainer.Trainer
+      accelerator: gpu
+      strategy: ddp_find_unused_parameters_true
+      devices: auto
+      num_nodes: 1
+      precision: 16-mixed
+      logger:
+      - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
+        experiment_name: Default
+        run_name: null
+        tracking_uri: http://127.0.0.1:6101
+        tags: null
+        save_dir: null
+        prefix: ''
+        artifact_location: null
+        run_id: c6282b552628486eaf420045a3332d93
+      callbacks:
+      - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+        dirpath: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/best-checkpoints/
+        filename: null
+        monitor: validation_f1_score
+        verbose: false
+        save_last: true
+        save_top_k: 2
+        mode: max
+        auto_insert_metric_name: false
+        save_weights_only: false
+        every_n_train_steps: null
+        train_time_interval: null
+        every_n_epochs: null
+        save_on_train_epoch_end: null
+      - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+        dirpath: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/last-checkpoints/
+        filename: checkpoint-{epoch}
+        monitor: null
+        verbose: false
+        save_last: true
+        save_top_k: -1
+        mode: min
+        auto_insert_metric_name: false
+        save_weights_only: false
+        every_n_train_steps: 500
+        train_time_interval: null
+        every_n_epochs: null
+        save_on_train_epoch_end: null
+      - _target_: lightning.pytorch.callbacks.LearningRateMonitor
+        logging_interval: step
+      fast_dev_run: false
+      max_epochs: 3
+      min_epochs: null
+      max_steps: -1
+      min_steps: null
+      max_time: null
+      limit_train_batches: 0.01
+      limit_val_batches: 0.01
+      limit_test_batches: 0.01
+      limit_predict_batches: 1.0
+      overfit_batches: 0.0
+      val_check_interval: 1.0
+      check_val_every_n_epoch: 1
+      num_sanity_val_steps: 2
+      log_every_n_steps: 1
+      enable_checkpointing: true
+      enable_progress_bar: true
+      enable_model_summary: true
+      accumulate_grad_batches: 1
+      gradient_clip_val: 5.0
+      gradient_clip_algorithm: value
+      deterministic: null
+      benchmark: null
+      inference_mode: true
+      use_distributed_sampler: true
+      detect_anomaly: false
+      barebones: false
+      sync_batchnorm: true
+      reload_dataloaders_every_n_epochs: 0
+      default_root_dir: ./data/pytorch-lightning
+    best_training_checkpoint: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/best-checkpoints/last.ckpt
+    last_training_checkpoint: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/last-checkpoints/last.ckpt
+    tar_model_export_path: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/exported_model.tar.gz
+  binary_text_evaluation_task:
+    _target_: cybulde.evaluation.tasks.common_evaluation_task.CommonEvaluationTask
+    name: binary_text_evaluation_task
+    data_module:
+      _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
+      batch_size: 64
+      shuffle: false
+      num_workers: 8
+      pin_memory: true
+      drop_last: true
+      persistent_workers: false
+      train_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/train.parquet
+      dev_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/dev.parquet
+      test_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/test.parquet
+      transformation:
+        _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
+        pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
+        max_sequence_length: 100
+      text_column_name: cleaned_text
+      label_column_name: label
+    lightning_module:
+      _target_: cybulde.evaluation.lightning_modules.binary_text_evaluation.BinaryTextEvaluationLightningModule
+      _partial_: true
+    trainer:
+      _target_: lightning.pytorch.trainer.trainer.Trainer
+      accelerator: gpu
+      strategy: ddp_find_unused_parameters_true
+      devices: auto
+      num_nodes: 1
+      precision: 16-mixed
+      logger:
+      - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
+        experiment_name: Default
+        run_name: null
+        tracking_uri: http://127.0.0.1:6101
+        tags: null
+        save_dir: null
+        prefix: ''
+        artifact_location: null
+        run_id: c6282b552628486eaf420045a3332d93
+      callbacks:
+      - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+        dirpath: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/best-checkpoints/
+        filename: null
+        monitor: validation_f1_score
+        verbose: false
+        save_last: true
+        save_top_k: 2
+        mode: max
+        auto_insert_metric_name: false
+        save_weights_only: false
+        every_n_train_steps: null
+        train_time_interval: null
+        every_n_epochs: null
+        save_on_train_epoch_end: null
+      - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+        dirpath: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/last-checkpoints/
+        filename: checkpoint-{epoch}
+        monitor: null
+        verbose: false
+        save_last: true
+        save_top_k: -1
+        mode: min
+        auto_insert_metric_name: false
+        save_weights_only: false
+        every_n_train_steps: 500
+        train_time_interval: null
+        every_n_epochs: null
+        save_on_train_epoch_end: null
+      - _target_: lightning.pytorch.callbacks.LearningRateMonitor
+        logging_interval: step
+      fast_dev_run: false
+      max_epochs: 3
+      min_epochs: null
+      max_steps: -1
+      min_steps: null
+      max_time: null
+      limit_train_batches: 0.01
+      limit_val_batches: 0.01
+      limit_test_batches: 0.01
+      limit_predict_batches: 1.0
+      overfit_batches: 0.0
+      val_check_interval: 1.0
+      check_val_every_n_epoch: 1
+      num_sanity_val_steps: 2
+      log_every_n_steps: 1
+      enable_checkpointing: true
+      enable_progress_bar: true
+      enable_model_summary: true
+      accumulate_grad_batches: 1
+      gradient_clip_val: 5.0
+      gradient_clip_algorithm: value
+      deterministic: null
+      benchmark: null
+      inference_mode: true
+      use_distributed_sampler: true
+      detect_anomaly: false
+      barebones: false
+      sync_batchnorm: true
+      reload_dataloaders_every_n_epochs: 0
+      default_root_dir: ./data/pytorch-lightning
+    tar_model_path: /mlflow-artifact-store/0/c6282b552628486eaf420045a3332d93/artifacts/exported_model.tar.gz

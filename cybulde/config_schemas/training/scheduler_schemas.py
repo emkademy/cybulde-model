@@ -4,11 +4,16 @@ from typing import Optional
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
+from cybulde.utils.mixins import LoggableParamsMixin
+
 
 @dataclass
-class SchedulerConfig:
+class SchedulerConfig(LoggableParamsMixin):
     _target_: str = MISSING
     _partial_: bool = True
+
+    def loggable_params(self) -> list[str]:
+        return ["_target_"]
 
 
 @dataclass

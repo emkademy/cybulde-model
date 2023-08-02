@@ -1,4 +1,5 @@
 import itertools
+import os
 
 from typing import Any
 
@@ -37,4 +38,8 @@ def plot_confusion_matrix(confusion_matrix: Tensor, class_names: list[str]) -> A
     plt.xlabel("Predicted label", fontsize=20)
     plt.tight_layout()
 
-    return plt.figure
+    return plt.gcf()
+
+
+def get_local_rank() -> int:
+    return int(os.getenv("LOCAL_RANK", -1))

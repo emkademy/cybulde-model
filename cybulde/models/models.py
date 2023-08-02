@@ -4,10 +4,10 @@ from typing import Optional
 from torch import Tensor, nn
 from transformers import BatchEncoding
 
-from cybulde.data_modules.transformations import Transformation
 from cybulde.models.adapters import Adapter
 from cybulde.models.backbones import Backbone
 from cybulde.models.heads import Head
+from cybulde.models.transformations import Transformation
 
 
 class Model(nn.Module):

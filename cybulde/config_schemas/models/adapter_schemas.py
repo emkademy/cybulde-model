@@ -1,13 +1,18 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
+from cybulde.utils.mixins import LoggableParamsMixin
+
 
 @dataclass
-class AdapterConfig:
+class AdapterConfig(LoggableParamsMixin):
     _target_: str = MISSING
+
+    def loggable_params(self) -> list[str]:
+        return ["_target_"]
 
 
 @dataclass
@@ -22,6 +27,24 @@ class MLPWithPoolingConfig(AdapterConfig):
     standardize_input: bool = True
     pooling_method: Optional[str] = None
     output_attribute_to_use: Optional[str] = None
+
+    def loggable_params(self) -> list[str]:
+        return super().loggable_params() + [
+            "output_feature_sizes",
+            "biases",
+            "activation_fns",
+            "dropout_drop_probs",
+            "batch_norms",
+            "order",
+            "pooling_method",
+            "output_attribute_to_use",
+        ]
+
+
+@dataclass
+class PoolerOutputAdapterConfig(MLPWithPoolingConfig):
+    output_feature_sizes: list[int] = field(default_factory=lambda: [-1])
+    output_attribute_to_use: str = "pooler_output"
 
 
 def setup_config() -> None:

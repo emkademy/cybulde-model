@@ -1,14 +1,14 @@
 from dataclasses import dataclass
-from typing import Any
 
 from hydra.core.config_store import ConfigStore
-from omegaconf import MISSING
+from omegaconf import MISSING, SI
 
-from cybulde.config_schemas import transformations_schemas
+from cybulde.config_schemas.models import transformation_schemas
+from cybulde.utils.mixins import LoggableParamsMixin
 
 
 @dataclass
-class DataModuleConfig:
+class DataModuleConfig(LoggableParamsMixin):
     _target_: str = MISSING
     batch_size: int = MISSING
     shuffle: bool = False
@@ -17,6 +17,9 @@ class DataModuleConfig:
     drop_last: bool = True
     persistent_workers: bool = False
 
+    def loggable_params(self) -> list[str]:
+        return ["_target_", "batch_size"]
+
 
 @dataclass
 class TextClassificationDataModuleConfig(DataModuleConfig):
@@ -24,13 +27,24 @@ class TextClassificationDataModuleConfig(DataModuleConfig):
     train_df_path: str = MISSING
     dev_df_path: str = MISSING
     test_df_path: str = MISSING
-    transformation: transformations_schemas.Transformation = MISSING
+    transformation: transformation_schemas.TransformationConfig = MISSING
     text_column_name: str = "cleaned_text"
     label_column_name: str = "label"
 
 
+@dataclass
+class ScrappedDataTextClassificationDataModuleConfig(TextClassificationDataModuleConfig):
+    batch_size: int = 64
+    train_df_path: str = "gs://emkademy/cybulde/data/processed/rebalanced_splits/train.parquet"
+    dev_df_path: str = "gs://emkademy/cybulde/data/processed/rebalanced_splits/dev.parquet"
+    test_df_path: str = "gs://emkademy/cybulde/data/processed/rebalanced_splits/test.parquet"
+    transformation: transformation_schemas.TransformationConfig = SI(
+        "${..lightning_module.model.backbone.transformation}"
+    )
+
+
 def setup_config() -> None:
-    transformations_schemas.setup_config()
+    transformation_schemas.setup_config()
 
     cs = ConfigStore.instance()
     cs.store(

@@ -1,5 +1,6 @@
 import pandas as pd
 
+from torch import Tensor
 from torch.utils.data import Dataset
 
 
@@ -10,13 +11,13 @@ class TextClassificationDataset(Dataset):
         self.text_column_name = text_column_name
         self.label_column_name = label_column_name
 
-    def __getitem__(self, idx: int) -> tuple[str, int]:
+    def __getitem__(self, idx: int) -> tuple[str, Tensor]:
         row = self.df.iloc[idx]
 
         text = row[self.text_column_name]
         label = row[self.label_column_name]
 
-        return text, label
+        return text, Tensor([label])
 
     def __len__(self) -> int:
         return len(self.df)

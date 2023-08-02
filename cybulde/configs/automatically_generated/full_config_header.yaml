@@ -1,5 +1,5 @@
 defaults:
-  - config_schema
+  # - config_schema
 
   - override hydra/job_logging: custom
   - override hydra/hydra_logging: disabled

@@ -21,13 +21,13 @@ class TrainingTask(ABC):
         lightning_module: TrainingLightningModule,
         trainer: Trainer,
         best_training_checkpoint: str,
-        last_training_checkpoing: str,
+        last_training_checkpoint: str,
     ) -> None:
         super().__init__()
         self.name = name
         self.trainer = trainer
         self.best_training_checkpoint = best_training_checkpoint
-        self.last_training_checkpoing = last_training_checkpoing
+        self.last_training_checkpoint = last_training_checkpoint
         self.logger = get_logger(self.__class__.__name__)
 
         self.lightning_module = lightning_module
