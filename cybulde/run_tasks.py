@@ -2,7 +2,6 @@ import torch
 
 from hydra.utils import instantiate
 from lightning.pytorch import seed_everything
-from omegaconf import OmegaConf
 
 from cybulde.config_schemas.config_schema import Config
 from cybulde.utils.config_utils import get_config
