@@ -1,11 +1,12 @@
 from typing import TYPE_CHECKING, Union
 
+from hydra.utils import instantiate
 from lightning.pytorch import Trainer
 
 from cybulde.data_modules.data_modules import DataModule, PartialDataModule
 from cybulde.evaluation.lightning_modules.bases import PartialEvaluationLightningModuleType
 from cybulde.evaluation.tasks.bases import TarModelEvaluationTask
-from cybulde.utils.mlflow_utils import activate_mlflow
+from cybulde.utils.mlflow_utils import activate_mlflow, log_model
 
 if TYPE_CHECKING:
     from cybulde.config_schemas.config_schema import Config
@@ -36,3 +37,10 @@ class CommonEvaluationTask(TarModelEvaluationTask):
 
         with activate_mlflow(experiment_name=experiment_name, run_id=run_id, run_name=run_name) as _:
             self.trainer.test(model=self.lightning_module, datamodule=self.data_module)
+
+        model_selector = instantiate(config.model_selector)
+        if model_selector is not None:
+            if model_selector.is_selected():
+                log_model(
+                    config.infrastructure.mlflow, model_selector.get_new_best_run_tag(), config.registered_model_name
+                )

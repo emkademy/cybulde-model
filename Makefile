@@ -116,6 +116,10 @@ down:
 exec-in: up
 	docker exec -it $(CONTAINER_NAME) bash
 
+## Clean MLFlow volumes
+clean-mlflow-volumes: down
+	docker volume rm cybulde-model_postgresql-mlflow-data cybulde-model_postgresql-optuna-data cybulde-model_mlflow-artifact-store
+
 .DEFAULT_GOAL := help
 
 # Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
