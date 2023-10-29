@@ -13,6 +13,8 @@ MLFLOW_TRACKING_URI=$(curl --silent http://metadata.google.internal/computeMetad
 NODE_COUNT=$(curl --silent http://metadata.google.internal/computeMetadata/v1/instance/attributes/node_count -H "Metadata-Flavor: Google")
 DISKS=$(curl --silent http://metadata.google.internal/computeMetadata/v1/instance/attributes/disks -H "Metadata-Flavor: Google")
 
+INSTANCE_GROUP_NAME=$(echo ${INSTANCE_GROUP_NAME} | tr '[:upper:]' '[:lower:]')
+
 echo -e "TRAINING: instance group name: ${INSTANCE_GROUP_NAME}, docker image: ${DOCKER_IMAGE}, node count: ${NODE_COUNT}, python hash seed: ${PYTHON_HASH_SEED}"
 
 echo "============= Installing Nvidia Drivers ==============="
