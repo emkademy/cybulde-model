@@ -2,12 +2,8 @@
 # If you want to modify configuration, edit source files in cybulde/configs directory.
 
 defaults:
-  # - config_schema
-
-  - override hydra/job_logging: custom
-  - override hydra/hydra_logging: disabled
-  - _self_
-
+- override hydra/hydra_logging: disabled
+- _self_
 hydra:
   output_subdir: null
   run:
@@ -16,15 +12,54 @@ hydra:
 infrastructure:
   project_id: cybulde
   zone: europe-west4-a
+  instance_group_creator:
+    _target_: cybulde.infrastructure.instance_group_creator.InstanceGroupCreator
+    instance_template_creator:
+      _target_: cybulde.infrastructure.instance_template_creator.InstanceTemplateCreator
+      scopes:
+      - https://www.googleapis.com/auth/cloud-platform
+      - https://www.googleapis.com/auth/cloud.useraccounts.readonly
+      - https://www.googleapis.com/auth/cloudruntimeconfig
+      network: https://www.googleapis.com/compute/v1/projects/cybulde/global/networks/default
+      subnetwork: https://www.googleapis.com/compute/v1/projects/cybulde/regions/europe-west4/subnetworks/default
+      startup_script_path: scripts/vm_startup/task_runner_startup_script.sh
+      vm_config:
+        machine_type: n1-standard-8
+        accelerator_count: 1
+        accelerator_type: nvidia-tesla-t4
+        vm_type: STANDARD
+        disks: []
+      boot_disk_config:
+        project_id: deeplearning-platform-release
+        name: common-cu113-v20230925
+        size_gb: 50
+        labels:
+          project: cybulde
+      vm_metadata_config:
+        instance_group_name: Default-None-20231029103044
+        docker_image: europe-west4-docker.pkg.dev/cybulde/cybulde/cybulde-model:train-eaa1426e-2dab-4b66-a0d3-4e55cabe673e
+        zone: europe-west4-a
+        python_hash_seed: 42
+        mlflow_tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
+        node_count: 1
+        disks: []
+      template_name: Default-None-20231029103044
+      project_id: cybulde
+      labels:
+        project: cybulde
+    name: Default-None-20231029103044
+    node_count: 1
+    project_id: cybulde
+    zone: europe-west4-a
   mlflow:
-    mlflow_external_tracking_uri: http://127.0.0.1:6101
-    mlflow_internal_tracking_uri: http://127.0.0.1:6101
+    mlflow_external_tracking_uri: http://localhost:6100
+    mlflow_internal_tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
     experiment_name: Default
     run_name: null
-    run_id: e3b19f91c1504f1dba6b687e9b63b4d1
+    run_id: 180aa022719c4e9fa78bed15c7cc58fd
     experiment_id: '0'
-    experiment_url: http://127.0.0.1:6101/#/experiments/0/runs/e3b19f91c1504f1dba6b687e9b63b4d1
-    artifact_uri: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts
+    experiment_url: http://localhost:6100/#/experiments/0/runs/180aa022719c4e9fa78bed15c7cc58fd
+    artifact_uri: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts
 save_last_checkpoint_every_n_train_steps: 500
 seed: 1234
 tasks:
@@ -122,15 +157,15 @@ tasks:
       - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
         experiment_name: Default
         run_name: null
-        tracking_uri: http://127.0.0.1:6101
+        tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
         tags: null
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: e3b19f91c1504f1dba6b687e9b63b4d1
+        run_id: 180aa022719c4e9fa78bed15c7cc58fd
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/best-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -144,7 +179,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/last-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -189,9 +224,9 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    best_training_checkpoint: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/best-checkpoints/last.ckpt
-    last_training_checkpoint: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/last-checkpoints/last.ckpt
-    tar_model_export_path: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/exported_model.tar.gz
+    best_training_checkpoint: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/last.ckpt
+    last_training_checkpoint: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/last.ckpt
+    tar_model_export_path: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/exported_model.tar.gz
   binary_text_evaluation_task:
     _target_: cybulde.evaluation.tasks.common_evaluation_task.CommonEvaluationTask
     name: binary_text_evaluation_task
@@ -226,15 +261,15 @@ tasks:
       - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
         experiment_name: Default
         run_name: null
-        tracking_uri: http://127.0.0.1:6101
+        tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
         tags: null
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: e3b19f91c1504f1dba6b687e9b63b4d1
+        run_id: 180aa022719c4e9fa78bed15c7cc58fd
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/best-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -248,7 +283,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/last-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -293,10 +328,10 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    tar_model_path: /mlflow-artifact-store/0/e3b19f91c1504f1dba6b687e9b63b4d1/artifacts/exported_model.tar.gz
+    tar_model_path: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/exported_model.tar.gz
 model_selector:
   _target_: cybulde.evaluation.model_selector.ModelSelector
-  mlflow_run_id: e3b19f91c1504f1dba6b687e9b63b4d1
+  mlflow_run_id: 180aa022719c4e9fa78bed15c7cc58fd
   must_be_better_metric_comparers:
     f1_score:
       _target_: cybulde.evaluation.model_selector.MetricComparer

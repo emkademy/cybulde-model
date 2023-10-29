@@ -20,6 +20,7 @@ transformers = { version = "~=4.31", extras = ["torch"] }
 mlflow = "==2.5.0"
 psycopg2-binary = "~=2.9"
 google-cloud-compute = "~=1.13"
+google-cloud-secret-manager = "~=2.16"
 
 [tool.poetry.group.dev.dependencies]
 jupyterlab = "~=4.0"

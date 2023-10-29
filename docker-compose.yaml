@@ -62,6 +62,7 @@ services:
     env_file:
       - .envs/.mlflow-common
       - .envs/.mlflow-prod
+      - .envs/.infrastructure
     ports:
       - ${PROD_MLFLOW_SERVER_PORT}:${PROD_MLFLOW_SERVER_PORT}
     profiles:

@@ -3,6 +3,7 @@ import logging.config
 import sys
 
 from io import StringIO
+from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 import hydra
@@ -12,7 +13,7 @@ from hydra.types import TaskFunction
 from omegaconf import DictConfig, OmegaConf
 
 from cybulde.config_schemas import config_schema
-from cybulde.utils.io_utils import open_file
+from cybulde.utils.io_utils import open_file, write_yaml_file
 
 if TYPE_CHECKING:
     from cybulde.config_schemas.config_schema import Config
@@ -85,5 +86,18 @@ def save_config_as_yaml(config: Union["Config", DictConfig], save_path: str) -> 
 
 
 def load_config_header() -> str:
-    with open("./cybulde/configs/automatically_generated/full_config_header.yaml", "r") as f:
+    config_header_path = Path("./cybulde/configs/automatically_generated/full_config_header.yaml")
+    if not config_header_path.exists():
+        config_header = {
+            "defaults": [
+                # {"override hydra/job_logging": "custom"},
+                {"override hydra/hydra_logging": "disabled"},
+                "_self_",
+            ],
+            "hydra": {"output_subdir": None, "run": {"dir": "."}},
+        }
+        config_header_path.parent.mkdir(parents=True, exist_ok=True)
+        write_yaml_file(str(config_header_path), config_header)
+
+    with open(config_header_path, "r") as f:
         return f.read()
