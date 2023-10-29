@@ -11,7 +11,7 @@ hydra:
 
 infrastructure:
   project_id: cybulde
-  zone: europe-west4-a
+  zone: europe-west4-b
   instance_group_creator:
     _target_: cybulde.infrastructure.instance_group_creator.InstanceGroupCreator
     instance_template_creator:
@@ -36,30 +36,30 @@ infrastructure:
         labels:
           project: cybulde
       vm_metadata_config:
-        instance_group_name: Default-None-20231029103044
-        docker_image: europe-west4-docker.pkg.dev/cybulde/cybulde/cybulde-model:train-eaa1426e-2dab-4b66-a0d3-4e55cabe673e
-        zone: europe-west4-a
+        instance_group_name: Default-None-20231029110956
+        docker_image: europe-west4-docker.pkg.dev/cybulde/cybulde/cybulde-model:train-921f87df-9f82-4782-bd7f-4641cad7e32b
+        zone: europe-west4-b
         python_hash_seed: 42
         mlflow_tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
         node_count: 1
         disks: []
-      template_name: Default-None-20231029103044
+      template_name: Default-None-20231029110956
       project_id: cybulde
       labels:
         project: cybulde
-    name: Default-None-20231029103044
+    name: Default-None-20231029110956
     node_count: 1
     project_id: cybulde
-    zone: europe-west4-a
+    zone: europe-west4-b
   mlflow:
     mlflow_external_tracking_uri: http://localhost:6100
     mlflow_internal_tracking_uri: http://cybulde-mlflow.europe-west4-a.c.cybulde.internal:6100
     experiment_name: Default
     run_name: null
-    run_id: 180aa022719c4e9fa78bed15c7cc58fd
+    run_id: c34c976721844ee8ad48c1cb7f74880e
     experiment_id: '0'
-    experiment_url: http://localhost:6100/#/experiments/0/runs/180aa022719c4e9fa78bed15c7cc58fd
-    artifact_uri: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts
+    experiment_url: http://localhost:6100/#/experiments/0/runs/c34c976721844ee8ad48c1cb7f74880e
+    artifact_uri: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts
 save_last_checkpoint_every_n_train_steps: 500
 seed: 1234
 tasks:
@@ -162,10 +162,10 @@ tasks:
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: 180aa022719c4e9fa78bed15c7cc58fd
+        run_id: c34c976721844ee8ad48c1cb7f74880e
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -179,7 +179,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -224,9 +224,9 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    best_training_checkpoint: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/last.ckpt
-    last_training_checkpoint: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/last.ckpt
-    tar_model_export_path: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/exported_model.tar.gz
+    best_training_checkpoint: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/best-checkpoints/last.ckpt
+    last_training_checkpoint: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/last-checkpoints/last.ckpt
+    tar_model_export_path: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/exported_model.tar.gz
   binary_text_evaluation_task:
     _target_: cybulde.evaluation.tasks.common_evaluation_task.CommonEvaluationTask
     name: binary_text_evaluation_task
@@ -266,10 +266,10 @@ tasks:
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: 180aa022719c4e9fa78bed15c7cc58fd
+        run_id: c34c976721844ee8ad48c1cb7f74880e
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/best-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -283,7 +283,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/last-checkpoints/
+        dirpath: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -328,10 +328,10 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    tar_model_path: gs://emkademy-mlflow/0/180aa022719c4e9fa78bed15c7cc58fd/artifacts/exported_model.tar.gz
+    tar_model_path: gs://emkademy-mlflow/0/c34c976721844ee8ad48c1cb7f74880e/artifacts/exported_model.tar.gz
 model_selector:
   _target_: cybulde.evaluation.model_selector.ModelSelector
-  mlflow_run_id: 180aa022719c4e9fa78bed15c7cc58fd
+  mlflow_run_id: c34c976721844ee8ad48c1cb7f74880e
   must_be_better_metric_comparers:
     f1_score:
       _target_: cybulde.evaluation.model_selector.MetricComparer

@@ -18,9 +18,8 @@ def run(config: "Config") -> None:
     run_id = config.infrastructure.mlflow.run_id
     assert run_id is not None
 
-    # instance_group_creator = instantiate(config.infrastructure.instance_group_creator)
-    # instance_ids = instance_group_creator.launch_instance_group()
-    instance_ids = [1]
+    instance_group_creator = instantiate(config.infrastructure.instance_group_creator)
+    instance_ids = instance_group_creator.launch_instance_group()
     training_info = TrainingInfo(
         project_id=config.infrastructure.project_id,
         zone=config.infrastructure.zone,

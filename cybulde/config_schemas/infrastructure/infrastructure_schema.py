@@ -22,7 +22,7 @@ class MLFlowConfig:
 @dataclass
 class InfrastructureConfig:
     project_id: str = "cybulde"
-    zone: str = "europe-west4-a"
+    zone: str = "europe-west4-b"
     instance_group_creator: InstanceGroupCreatorConfig = InstanceGroupCreatorConfig()
     mlflow: MLFlowConfig = MLFlowConfig()
 
