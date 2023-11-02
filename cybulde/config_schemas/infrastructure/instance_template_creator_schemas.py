@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Optional
 
 from omegaconf import SI
 
@@ -32,6 +32,7 @@ class VMMetadataConfig:
     mlflow_tracking_uri: str = SI("${infrastructure.mlflow.mlflow_internal_tracking_uri}")
     node_count: int = 1
     disks: Any = SI("${..vm_config.disks}")
+    etcd_ip: Optional[str] = SI("${infrastructure.etcd_ip}")
 
 
 @dataclass
