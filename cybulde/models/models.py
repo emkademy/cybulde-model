@@ -28,6 +28,7 @@ class BinaryTextClassificationModel(Model):
         if self.adapter is not None:
             output = self.adapter(output)
         output = self.head(output)
+        assert isinstance(output, Tensor)
         return output
 
     def get_transformation(self) -> Transformation:

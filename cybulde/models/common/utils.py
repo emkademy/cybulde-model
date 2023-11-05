@@ -15,11 +15,11 @@ def get_global_rank() -> int:
 
 
 @contextmanager
-def local_rank_zero_first() -> Generator[None, None, None]:  # type: ignore
-    if not torch.distributed.is_initialized() and os.getenv("RANK") is not None:  # type: ignore
+def local_rank_zero_first() -> Generator[None, None, None]:
+    if not torch.distributed.is_initialized() and os.getenv("RANK") is not None:
         raise RuntimeError("RANK is set but torch.distributed is not initialized")
 
-    if torch.distributed.is_initialized():  # type: ignore
+    if torch.distributed.is_initialized():
         rank = get_local_rank()
         if rank not in [-1, 0]:
             torch.distributed.barrier()  # type: ignore
@@ -31,11 +31,11 @@ def local_rank_zero_first() -> Generator[None, None, None]:  # type: ignore
 
 
 @contextmanager
-def global_rank_zero_first() -> Generator[None, None, None]:  # type: ignore
-    if not torch.distributed.is_initialized() and os.getenv("RANK") is not None:  # type: ignore
+def global_rank_zero_first() -> Generator[None, None, None]:
+    if not torch.distributed.is_initialized() and os.getenv("RANK") is not None:
         raise RuntimeError("RANK is set but torch.distributed is not initialized")
 
-    if torch.distributed.is_initialized():  # type: ignore
+    if torch.distributed.is_initialized():
         rank = get_global_rank()
         if rank not in [-1, 0]:
             torch.distributed.barrier()  # type: ignore

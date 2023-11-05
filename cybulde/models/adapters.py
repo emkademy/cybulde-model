@@ -82,7 +82,7 @@ class MLPLayer(Adapter):
 
         nrof_layers = len(self.output_feature_sizes) - 1
         biases = [False] * nrof_layers if biases is None else biases
-        activation_functions = [None] * nrof_layers if activation_fns is None else activation_fns
+        activation_functions: list[Optional[str]] = [None] * nrof_layers if activation_fns is None else activation_fns
         dropout_drop_probabilities = [0.0] * nrof_layers if dropout_drop_probs is None else dropout_drop_probs
         batch_normalizations = [False] * nrof_layers if batch_norms is None else batch_norms
 
@@ -151,7 +151,7 @@ class MLPWithPooling(Adapter):
                 standardize_input=standardize_input,
             )
         else:
-            self.projection = nn.Identity()
+            self.projection = nn.Identity()  # type: ignore
 
         if pooling_method == "mean_pooler":
             self.pooler = mean_pool_tokens
@@ -163,12 +163,13 @@ class MLPWithPooling(Adapter):
         if output_attribute_to_use is not None:
             self.get_output_tensor = attrgetter(output_attribute_to_use)
         else:
-            self.get_output_tensor = nn.Identity()
+            self.get_output_tensor = nn.Identity()  # type: ignore
 
     def forward(self, backbone_output: BaseModelOutputWithPooling) -> Tensor:
         output = self.get_output_tensor(backbone_output)
         output = self.pooler(output)
         output = self.projection(output)
+        assert isinstance(output, Tensor)
         return output
 
 

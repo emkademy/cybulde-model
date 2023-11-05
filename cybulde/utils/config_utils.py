@@ -33,7 +33,7 @@ def get_config(
 
             if not return_dict_config:
                 assert to_object
-                return task_function(config)  # type: ignore
+                return task_function(config)
             return task_function(dict_config)
 
         return decorated_main

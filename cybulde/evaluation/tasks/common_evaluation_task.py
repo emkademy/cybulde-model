@@ -39,6 +39,7 @@ class CommonEvaluationTask(TarModelEvaluationTask):
             self.trainer.test(model=self.lightning_module, datamodule=self.data_module)
 
         model_selector = instantiate(config.model_selector)
+        assert config.registered_model_name is not None
         if model_selector is not None:
             if model_selector.is_selected():
                 log_model(

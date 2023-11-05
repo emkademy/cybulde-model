@@ -15,8 +15,8 @@ class TrainerConfig(LoggableParamsMixin):
     devices: str = "auto"
     num_nodes: int = 1  # SI("${}")
     precision: str = "16-mixed"
-    logger: Optional[list[logger_schemas.LoggerConfig]] = field(default_factory=lambda: [])
-    callbacks: Optional[list[callbacks_schemas.CallbackConfig]] = field(default_factory=lambda: [])
+    logger: Optional[list[logger_schemas.LoggerConfig]] = field(default_factory=lambda: [])  # type: ignore
+    callbacks: Optional[list[callbacks_schemas.CallbackConfig]] = field(default_factory=lambda: [])  # type: ignore
     fast_dev_run: bool = False
     max_epochs: Optional[int] = None
     min_epochs: Optional[int] = None
@@ -62,7 +62,7 @@ class GPUDev(TrainerConfig):
     limit_test_batches: float = 0.01
     logger: Optional[list[logger_schemas.LoggerConfig]] = field(
         default_factory=lambda: [logger_schemas.MLFlowLoggerConfig()]
-    )
+    )  # type: ignore
     callbacks: Optional[list[callbacks_schemas.CallbackConfig]] = field(
         default_factory=lambda: [
             callbacks_schemas.ValidationF1ScoreBestModelCheckpointConfig(),

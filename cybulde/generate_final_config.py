@@ -12,16 +12,17 @@ if TYPE_CHECKING:
     from cybulde.config_schemas.config_schema import Config
 
 
-@get_config_and_dict_config(config_path="../configs", config_name="config")
+@get_config_and_dict_config(config_path="../configs", config_name="config")  # type: ignore
 def generate_final_config(config: "Config", dict_config: DictConfig) -> None:
+    run: mlflow.ActiveRun
     with activate_mlflow(
         config.infrastructure.mlflow.experiment_name,
         run_id=config.infrastructure.mlflow.run_id,
         run_name=config.infrastructure.mlflow.run_name,
     ) as run:
-        run_id: str = run.info.run_id  # type: ignore
-        experiment_id: str = run.info.experiment_id  # type: ignore
-        artifact_uri: str = run.info.artifact_uri  # type: ignore
+        run_id: str = run.info.run_id
+        experiment_id: str = run.info.experiment_id
+        artifact_uri: str = run.info.artifact_uri
 
         dict_config.infrastructure.mlflow.artifact_uri = artifact_uri
         dict_config.infrastructure.mlflow.run_id = run_id

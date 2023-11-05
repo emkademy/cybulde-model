@@ -38,11 +38,12 @@ class BinaryTextClassificationTrainingLightningModule(ModelStateDictExportingTra
         self.training_confusion_matrix = BinaryConfusionMatrix()
         self.validation_confusion_matrix = BinaryConfusionMatrix()
 
-        self.train_step_outputs = defaultdict(list)
-        self.validation_step_outputs = defaultdict(list)
+        self.train_step_outputs: dict[str, list[Tensor]] = defaultdict(list)
+        self.validation_step_outputs: dict[str, list[Tensor]] = defaultdict(list)
 
     def forward(self, texts: BatchEncoding) -> Tensor:
-        return self.model(texts)
+        output: Tensor = self.model(texts)
+        return output
 
     def training_step(self, batch: tuple[BatchEncoding, Tensor], batch_idx: int) -> Tensor:
         texts, labels = batch
@@ -61,6 +62,7 @@ class BinaryTextClassificationTrainingLightningModule(ModelStateDictExportingTra
         self.train_step_outputs["logits"].append(logits)
         self.train_step_outputs["labels"].append(labels)
 
+        assert isinstance(loss, Tensor)
         return loss
 
     def on_train_epoch_end(self) -> None:
@@ -69,11 +71,11 @@ class BinaryTextClassificationTrainingLightningModule(ModelStateDictExportingTra
 
         confusion_matrix = self.training_confusion_matrix(all_logits, all_labels)
         figure = plot_confusion_matrix(confusion_matrix, ["0", "1"])
-        mlflow.log_figure(figure, "training_confusion_matrix.png")  # type: ignore
+        mlflow.log_figure(figure, "training_confusion_matrix.png")
 
         self.train_step_outputs = defaultdict(list)
 
-    def validation_step(self, batch: tuple[BatchEncoding, Tensor], batch_idx: int) -> dict[str, Tensor]:
+    def validation_step(self, batch: tuple[BatchEncoding, Tensor], batch_idx: int) -> dict[str, Tensor]:  # type: ignore
         texts, labels = batch
         logits = self(texts)
 
@@ -97,7 +99,7 @@ class BinaryTextClassificationTrainingLightningModule(ModelStateDictExportingTra
 
         confusion_matrix = self.validation_confusion_matrix(all_logits, all_labels)
         figure = plot_confusion_matrix(confusion_matrix, ["0", "1"])
-        mlflow.log_figure(figure, "validation_confusion_matrix.png")  # type: ignore
+        mlflow.log_figure(figure, "validation_confusion_matrix.png")
 
         self.validation_step_outputs = defaultdict(list)
 

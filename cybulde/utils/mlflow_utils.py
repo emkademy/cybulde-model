@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Generator, Iterable, Optional
 import mlflow
 
 from mlflow.pyfunc import PythonModel
+from mlflow.tracking.fluent import ActiveRun
 
 from cybulde.config_schemas.infrastructure.infrastructure_schema import MLFlowConfig
 from cybulde.utils.mixins import LoggableParamsMixin
@@ -25,7 +26,8 @@ def activate_mlflow(
 ) -> Iterable[mlflow.ActiveRun]:
     set_experiment(experiment_name)
 
-    with mlflow.start_run(run_name=run_name, run_id=run_id) as run:  # type: ignore
+    run: ActiveRun
+    with mlflow.start_run(run_name=run_name, run_id=run_id) as run:
         yield run
 
 
@@ -87,10 +89,11 @@ def get_best_run() -> dict[str, Any]:
 
     indices = best_runs["tags.best_run"].str.split("v").str[-1].astype(int).sort_values()
     best_runs = best_runs.reindex(index=indices.index)
-    return best_runs.iloc[-1].to_dict()
+    best_runs_dict: dict[str, Any] = best_runs.iloc[-1].to_dict()
+    return best_runs_dict
 
 
-class DummyWrapper(PythonModel):
+class DummyWrapper(PythonModel):  # type: ignore
     def load_context(self, some_path: str) -> None:
         pass
 

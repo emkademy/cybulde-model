@@ -24,12 +24,13 @@ class BinaryTextEvaluationLightningModule(EvaluationLightningModule):
         self.test_f1_score = BinaryF1Score()
         self.test_confusion_matrix = BinaryConfusionMatrix()
 
-        self.test_step_outputs = defaultdict(list)
+        self.test_step_outputs: dict[str, list[Tensor]] = defaultdict(list)
 
     def forward(self, texts: BatchEncoding) -> Tensor:
-        return self.model(texts)
+        output: Tensor = self.model(texts)
+        return output
 
-    def test_step(self, batch: tuple[BatchEncoding, Tensor], batch_idx: int) -> None:
+    def test_step(self, batch: tuple[BatchEncoding, Tensor], batch_idx: int) -> None:  # type: ignore
         texts, labels = batch
         logits = self(texts)
 
@@ -49,7 +50,7 @@ class BinaryTextEvaluationLightningModule(EvaluationLightningModule):
 
         confusion_matrix = self.test_confusion_matrix(all_logits, all_labels)
         figure = plot_confusion_matrix(confusion_matrix, ["0", "1"])
-        mlflow.log_figure(figure, "test_confusion_matrix.png")  # type: ignore
+        mlflow.log_figure(figure, "test_confusion_matrix.png")
 
         self.test_step_outputs = defaultdict(list)
 

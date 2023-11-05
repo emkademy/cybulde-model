@@ -32,4 +32,4 @@ def run_tasks(config: Config) -> None:
 
 
 if __name__ == "__main__":
-    run_tasks()  # type: ignore
+    run_tasks()

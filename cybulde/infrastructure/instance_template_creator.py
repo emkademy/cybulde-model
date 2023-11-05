@@ -117,7 +117,7 @@ class InstanceTemplateCreator:
         image_client = compute_v1.ImagesClient()
         return image_client.get(project=project_id, image=image_name)
 
-    def _attach_disks(self):
+    def _attach_disks(self) -> None:
         disk_names = self.vm_config.disks
         for disk_name in disk_names:
             disk = compute_v1.AttachedDisk(
@@ -153,14 +153,14 @@ class InstanceTemplateCreator:
         elif vm_type == VMType.SPOT:
             self.logger.info("Using SPOT machine")
             self.template.properties.scheduling = compute_v1.Scheduling(
-                provisioning_model=compute_v1.Scheduling.ProvisioningModel.SPOT.name,
-                on_host_maintenance=compute_v1.Scheduling.OnHostMaintenance.TERMINATE.name,
+                provisioning_model=compute_v1.Scheduling.ProvisioningModel.SPOT.name,  # type: ignore
+                on_host_maintenance=compute_v1.Scheduling.OnHostMaintenance.TERMINATE.name,  # type: ignore
             )
         elif vm_type == VMType.STANDARD:
             self.logger.info("Using STANDARD machine")
             self.template.properties.scheduling = compute_v1.Scheduling(
-                provisioning_model=compute_v1.Scheduling.ProvisioningModel.STANDARD.name,
-                on_host_maintenance=compute_v1.Scheduling.OnHostMaintenance.TERMINATE.name,
+                provisioning_model=compute_v1.Scheduling.ProvisioningModel.STANDARD.name,  # type: ignore
+                on_host_maintenance=compute_v1.Scheduling.OnHostMaintenance.TERMINATE.name,  # type: ignore
             )
         else:
             raise RuntimeError(f"Unsupported {vm_type=}")
@@ -169,7 +169,7 @@ class InstanceTemplateCreator:
         startup_script = self._read_startup_script(self.startup_script_path)
         self.template.properties.metadata.items.append(compute_v1.Items(key="startup-script", value=startup_script))
 
-        for meta_data_name, meta_data_value in self.vm_metadata_config.items():
+        for meta_data_name, meta_data_value in self.vm_metadata_config.items():  # type: ignore
             self.template.properties.metadata.items.append(
                 compute_v1.Items(key=meta_data_name, value=str(meta_data_value))
             )

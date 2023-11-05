@@ -30,5 +30,8 @@ class HuggingFaceBackbone(Backbone):
         path = translate_gcs_dir_to_local(pretrained_model_name_or_path)
         config = AutoConfig.from_pretrained(path)
         if pretrained:
-            return AutoModel.from_pretrained(path, config=config)
-        return AutoModel.from_config(config)
+            backbone_from_pretrained: nn.Module = AutoModel.from_pretrained(path, config=config)
+            return backbone_from_pretrained
+
+        backbone_from_config: nn.Module = AutoModel.from_config(config)
+        return backbone_from_config

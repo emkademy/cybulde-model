@@ -29,7 +29,7 @@ def wait_for_extended_operation(
     operation: ExtendedOperation, verbose_name: str = "operation", timeout: int = 300
 ) -> t.Any:
     try:
-        result = operation.result(timeout=timeout)
+        result = operation.result(timeout=timeout)  # type: ignore
     except GoogleAPICallError as ex:
         GCP_UTILS_LOGGER.exception("Exception occurred")
         for attr in ["details", "domain", "errors", "metadata", "reason", "response"]:
@@ -47,7 +47,7 @@ def wait_for_extended_operation(
             f"Error during {verbose_name}: [Code: {operation.error_code}]: {operation.error_message}"
         )
         GCP_UTILS_LOGGER.error(f"Operation ID: {operation.name}")
-        raise operation.exception() or RuntimeError(operation.error_message)
+        raise operation.exception() or RuntimeError(operation.error_message)  # type: ignore
 
     if operation.warnings:
         GCP_UTILS_LOGGER.warning(f"Warnings during {verbose_name}:\n")

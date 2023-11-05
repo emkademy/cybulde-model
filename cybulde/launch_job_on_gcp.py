@@ -32,4 +32,4 @@ def run(config: "Config") -> None:
 
 
 if __name__ == "__main__":
-    run()  # type: ignore
+    run()

@@ -25,15 +25,20 @@ class MetricComparer:
 
         if self.bigger_is_better:
             current_metric_value -= self.threshold
-            return current_metric_value > best_metric_value
+            result = current_metric_value > best_metric_value
+            assert isinstance(result, bool)
+            return result
         else:
             current_metric_value += self.threshold
-            return current_metric_value < best_metric_value
+            result = current_metric_value < best_metric_value
+            assert isinstance(result, bool)
+            return result
 
     def get_current_metric_value(self, run: Run) -> float:
         current_metric_value = run.data.metrics.get(self.metric_name, None)
         if current_metric_value is None:
             raise RuntimeError(f"Metric: {self.metric_name} couldn't be found on MLFlow. Was it logged?")
+        assert isinstance(current_metric_value, float)
         return current_metric_value
 
 
