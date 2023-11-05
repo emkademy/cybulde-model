@@ -27,6 +27,7 @@ class BinaryTextClassificationTrainingLightningModuleConfig(TrainingLightningMod
     _target_: str = (
         "cybulde.training.lightning_modules.binary_text_classification.BinaryTextClassificationTrainingLightningModule"
     )
+    pos_weight: Optional[float] = None
 
 
 @dataclass

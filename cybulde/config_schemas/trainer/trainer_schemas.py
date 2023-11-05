@@ -72,6 +72,23 @@ class GPUDev(TrainerConfig):
     )
 
 
+@dataclass
+class GPUProd(TrainerConfig):
+    max_epochs: int = 60
+    accelerator: str = "gpu"
+    log_every_n_steps: int = 1
+    logger: Optional[list[logger_schemas.LoggerConfig]] = field(
+        default_factory=lambda: [logger_schemas.MLFlowLoggerConfig()]
+    )  # type: ignore
+    callbacks: Optional[list[callbacks_schemas.CallbackConfig]] = field(
+        default_factory=lambda: [
+            callbacks_schemas.ValidationF1ScoreBestModelCheckpointConfig(),
+            callbacks_schemas.LastModelCheckpointConfig(),
+            callbacks_schemas.LearningRateMonitorConfig(),
+        ]
+    )
+
+
 def setup_config() -> None:
     logger_schemas.setup_config()
     callbacks_schemas.setup_config()

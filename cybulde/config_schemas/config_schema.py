@@ -18,6 +18,7 @@ class Config:
     tasks: dict[str, base_schemas.TaskConfig] = MISSING
     model_selector: Optional[model_selector_schemas.ModelSelectorConfig] = None
     registered_model_name: Optional[str] = None
+    docker_image: Optional[str] = None
 
 
 def setup_config() -> None:
