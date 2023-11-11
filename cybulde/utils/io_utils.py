@@ -21,6 +21,11 @@ def open_file(path: str, mode: str = "r") -> Any:
     return file_system.open(path, mode)
 
 
+def rename_file(path1: str, path2: str) -> Any:
+    file_system = choose_file_system(path1)
+    return file_system.rename(path1, path2)
+
+
 def write_yaml_file(yaml_file_path: str, yaml_file_content: dict[Any, Any]) -> None:
     with open_file(yaml_file_path, "w") as yaml_file:
         yaml.dump(yaml_file_content, yaml_file)
@@ -43,15 +48,23 @@ def make_dirs(path: str) -> None:
     file_system.makedirs(path, exist_ok=True)
 
 
-def list_paths(path: str) -> list[str]:
-    file_system = choose_file_system(path)
-    if not is_dir(path):
+def list_paths(data_path: str, check_path_suffix: bool = False, path_suffix: str = ".csv") -> list[str]:
+    file_system = choose_file_system(data_path)
+    if not file_system.isdir(data_path):
         return []
-    paths: list[str] = file_system.ls(path)
+    paths: list[str] = file_system.ls(data_path)
+    if check_path_suffix:
+        paths = [path for path in paths if path.endswith(path_suffix)]
     if GCS_FILE_SYSTEM_NAME in file_system.protocol:
-        gs_paths: list[str] = [f"{GCS_PREFIX}{path}" for path in paths]
+        gs_paths: list[str] = [GCS_PREFIX + file_path for file_path in paths]
         return gs_paths
-    return paths
+    else:
+        return paths
+
+
+def remove_path(path: str) -> None:
+    file_system = choose_file_system(path)
+    file_system.rm(path, recursive=True)
 
 
 def copy_dir(source_dir: str, target_dir: str) -> None:

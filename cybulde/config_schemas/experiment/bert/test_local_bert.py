@@ -9,17 +9,17 @@ from cybulde.config_schemas.config_schema import Config
 from cybulde.config_schemas.evaluation import model_selector_schemas
 from cybulde.config_schemas.evaluation.evaluation_task_schemas import DefaultCommonEvaluationTaskConfig
 from cybulde.config_schemas.prediction.prediction_task_schemas import ClassificationErrorVisualizerPredictionTaskConfig
-from cybulde.config_schemas.trainer.trainer_schemas import GPUProd
+from cybulde.config_schemas.trainer.trainer_schemas import GPUDev
 from cybulde.config_schemas.training.training_task_schemas import DefaultCommonTrainingTaskConfig
 
 
 @dataclass
-class LocalBertExperiment(Config):
+class TestLocalBertExperiment(Config):
     tasks: dict[str, TaskConfig] = field(
         default_factory=lambda: {
-            "binary_text_classification_task": DefaultCommonTrainingTaskConfig(trainer=GPUProd()),
+            "binary_text_classification_task": DefaultCommonTrainingTaskConfig(trainer=GPUDev()),
             "binary_text_evaluation_task": DefaultCommonEvaluationTaskConfig(),
-            "classification_error_visualizer_task": ClassificationErrorVisualizerPredictionTaskConfig(),
+            "classification_error_visualizer": ClassificationErrorVisualizerPredictionTaskConfig(),
         }
     )
     model_selector: Optional[
@@ -28,20 +28,19 @@ class LocalBertExperiment(Config):
     registered_model_name: Optional[str] = "bert_tiny"
 
 
-FinalLocalBertExperiment = OmegaConf.merge(
-    LocalBertExperiment,
+FinalTestLocalBertExperiment = OmegaConf.merge(
+    TestLocalBertExperiment,
     OmegaConf.from_dotlist(
         [
-            "infrastructure.mlflow.experiment_name=cybulde",
-            "tasks.binary_text_classification_task.data_module.batch_size=3072",
+            "infrastructure.mlflow.experiment_name=test-run-cybulde",
             "tasks.binary_text_evaluation_task.tar_model_path=${tasks.binary_text_classification_task.tar_model_export_path}",
             "tasks.binary_text_evaluation_task.data_module=${tasks.binary_text_classification_task.data_module}",
             "tasks.binary_text_evaluation_task.trainer=${tasks.binary_text_classification_task.trainer}",
-            "tasks.classification_error_visualizer_task.tar_model_path=${tasks.binary_text_classification_task.tar_model_export_path}",
-            "tasks.classification_error_visualizer_task.data_module=${tasks.binary_text_classification_task.data_module}",
+            "tasks.classification_error_visualizer.tar_model_path=${tasks.binary_text_classification_task.tar_model_export_path}",
+            "tasks.classification_error_visualizer.data_module=${tasks.binary_text_classification_task.data_module}",
         ]
     ),
 )
 
 cs = ConfigStore.instance()
-cs.store(name="local_bert", group="experiment/bert", node=FinalLocalBertExperiment, package="_global_")
+cs.store(name="test_local_bert", group="experiment/bert", node=FinalTestLocalBertExperiment, package="_global_")

@@ -58,6 +58,12 @@ class LearningRateMonitorConfig(CallbackConfig):
     logging_interval: str = "step"
 
 
+@dataclass
+class CustomPredictionWriterConfig(CallbackConfig):
+    _target_: str = "cybulde.utils.pl_utils.CustomPredictionWriter"
+    output_dir: str = SI("${oc.select:....predictions_output_dir,${infrastructure.mlflow.artifact_uri}/predictions/}")
+
+
 def setup_config() -> None:
     cs = ConfigStore.instance()
 

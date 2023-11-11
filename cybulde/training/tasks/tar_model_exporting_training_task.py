@@ -5,7 +5,7 @@ import pandas as pd
 from lightning.pytorch import Trainer
 from torch import Tensor
 
-from cybulde.data_modules.data_modules import DataModule, PartialDataModule
+from cybulde.data_modules.data_modules import DataModule, PartialDataModuleType
 from cybulde.models.common.exporter import TarModelExporter
 from cybulde.training.lightning_modules.bases import ModelStateDictExportingTrainingLightningModule
 from cybulde.training.tasks.bases import TrainingTask
@@ -21,7 +21,7 @@ class TarModelExportingTrainingTask(TrainingTask):
     def __init__(
         self,
         name: str,
-        data_module: Union[DataModule, PartialDataModule],
+        data_module: Union[DataModule, PartialDataModuleType],
         lightning_module: ModelStateDictExportingTrainingLightningModule,
         trainer: Trainer,
         best_training_checkpoint: str,

@@ -49,7 +49,7 @@ class DataModule(LightningDataModule):
         )
 
 
-class PartialDataModule(Protocol):
+class PartialDataModuleType(Protocol):
     def __call__(self, transformation: Transformation) -> DataModule:
         ...
 
@@ -105,7 +105,7 @@ class TextClassificationDataModule(DataModule):
                 self.dev_df_path, self.text_column_name, self.label_column_name
             )
 
-        if stage == "test":
+        if stage in {"test", "predict"}:
             self.test_dataset = TextClassificationDataset(
                 self.test_df_path, self.text_column_name, self.label_column_name
             )
@@ -118,3 +118,6 @@ class TextClassificationDataModule(DataModule):
 
     def test_dataloader(self) -> DataLoader:
         return self.initialize_dataloader(self.test_dataset, is_test=True)
+
+    def predict_dataloader(self) -> DataLoader:
+        return self.test_dataloader()

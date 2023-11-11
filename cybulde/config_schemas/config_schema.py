@@ -5,8 +5,9 @@ from omegaconf import MISSING
 from pydantic.dataclasses import dataclass
 
 from cybulde.config_schemas import base_schemas
-from cybulde.config_schemas.evaluation import model_selector_schemas
+from cybulde.config_schemas.evaluation import evaluation_task_schemas, model_selector_schemas
 from cybulde.config_schemas.infrastructure import infrastructure_schema
+from cybulde.config_schemas.prediction import prediction_task_schemas
 from cybulde.config_schemas.training import training_task_schemas
 
 
@@ -24,6 +25,8 @@ class Config:
 def setup_config() -> None:
     infrastructure_schema.setup_config()
     training_task_schemas.setup_config()
+    evaluation_task_schemas.setup_config()
+    prediction_task_schemas.setup_config()
     model_selector_schemas.setup_config()
 
     cs = ConfigStore.instance()

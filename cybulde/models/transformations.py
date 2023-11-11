@@ -2,6 +2,7 @@ import os
 
 from abc import ABC, abstractmethod
 
+from torch import Tensor
 from transformers import AutoTokenizer, BatchEncoding, PreTrainedTokenizerBase
 
 from cybulde.utils.io_utils import is_dir, is_file, translate_gcs_dir_to_local
@@ -10,6 +11,10 @@ from cybulde.utils.io_utils import is_dir, is_file, translate_gcs_dir_to_local
 class Transformation(ABC):
     @abstractmethod
     def __call__(self, texts: list[str]) -> BatchEncoding:
+        ...
+
+    @abstractmethod
+    def decode(self, input_ids: Tensor, skip_special_tokens: bool = False) -> list[str]:
         ...
 
 
@@ -23,6 +28,10 @@ class HuggingFaceTokenizationTransformation(Transformation):
         output: BatchEncoding = self.tokenizer.batch_encode_plus(
             texts, truncation=True, padding=True, return_tensors="pt", max_length=self.max_sequence_length
         )
+        return output
+
+    def decode(self, input_ids: Tensor, skip_special_tokens: bool = False) -> list[str]:
+        output: list[str] = self.tokenizer.batch_decode(input_ids, skip_special_tokens=skip_special_tokens)
         return output
 
     def get_tokenizer(self, pretrained_tokenizer_name_or_path: str) -> PreTrainedTokenizerBase:

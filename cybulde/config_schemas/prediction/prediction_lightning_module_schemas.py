@@ -7,7 +7,7 @@ from cybulde.config_schemas.base_schemas import LightningModuleConfig
 
 
 @dataclass
-class EvaluationLightningModuleConfig(LightningModuleConfig):
+class PredictionLightningModuleConfig(LightningModuleConfig):
     _target_: str = MISSING
     _partial_: bool = False
 
@@ -16,13 +16,13 @@ class EvaluationLightningModuleConfig(LightningModuleConfig):
 
 
 @dataclass
-class PartialEvaluationLightningModuleConfig(EvaluationLightningModuleConfig):
+class PartialPredictionLightningModuleConfig(PredictionLightningModuleConfig):
     _partial_: bool = True
 
 
 @dataclass
-class BinaryTextEvaluationLightningModuleConfig(PartialEvaluationLightningModuleConfig):
-    _target_: str = "cybulde.evaluation.lightning_modules.binary_text_evaluation.BinaryTextEvaluationLightningModule"
+class BinaryTextClassificationPredictionLightningModuleConfig(PartialPredictionLightningModuleConfig):
+    _target_: str = "cybulde.prediction.lightning_modules.binary_text_classification.BinaryTextClassificationPredictionLightningModule"
 
 
 def setup_config() -> None:
@@ -30,5 +30,5 @@ def setup_config() -> None:
     cs.store(
         name="binary_text_classification_prediction_lightning_module_schema",
         group="tasks/lightning_module",
-        node=BinaryTextEvaluationLightningModuleConfig,
+        node=BinaryTextClassificationPredictionLightningModuleConfig,
     )

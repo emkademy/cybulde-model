@@ -76,7 +76,7 @@ class GPUDev(TrainerConfig):
 class GPUProd(TrainerConfig):
     max_epochs: int = 60
     accelerator: str = "gpu"
-    log_every_n_steps: int = 1
+    log_every_n_steps: int = 10
     logger: Optional[list[logger_schemas.LoggerConfig]] = field(
         default_factory=lambda: [logger_schemas.MLFlowLoggerConfig()]
     )  # type: ignore
@@ -86,6 +86,19 @@ class GPUProd(TrainerConfig):
             callbacks_schemas.LastModelCheckpointConfig(),
             callbacks_schemas.LearningRateMonitorConfig(),
         ]
+    )
+
+
+@dataclass
+class PredictionTraninerConfig(TrainerConfig):
+    max_epochs: int = 4096
+    accelerator: str = "gpu"
+    log_every_n_steps: int = 10
+    logger: Optional[list[logger_schemas.LoggerConfig]] = field(
+        default_factory=lambda: [logger_schemas.MLFlowLoggerConfig()]
+    )
+    callbacks: Optional[list[callbacks_schemas.CallbackConfig]] = field(
+        default_factory=lambda: [callbacks_schemas.CustomPredictionWriterConfig()]
     )
 
 

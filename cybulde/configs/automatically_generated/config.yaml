@@ -36,7 +36,7 @@ infrastructure:
         labels:
           project: cybulde
       vm_metadata_config:
-        instance_group_name: cybulde-None-20231105174741
+        instance_group_name: test-run-cybulde-None-20231111113055
         docker_image: null
         zone: europe-west4-b
         python_hash_seed: 42
@@ -44,23 +44,23 @@ infrastructure:
         node_count: 1
         disks: []
         etcd_ip: 10.164.0.12:2379
-      template_name: cybulde-None-20231105174741
+      template_name: test-run-cybulde-None-20231111113055
       project_id: cybulde
       labels:
         project: cybulde
-    name: cybulde-None-20231105174741
+    name: test-run-cybulde-None-20231111113055
     node_count: 1
     project_id: cybulde
     zone: europe-west4-b
   mlflow:
     mlflow_external_tracking_uri: http://127.0.0.1:6101
     mlflow_internal_tracking_uri: http://127.0.0.1:6101
-    experiment_name: cybulde
+    experiment_name: test-run-cybulde
     run_name: null
-    run_id: ffb98098eb5744dbb8fb78388088d8e7
-    experiment_id: '3'
-    experiment_url: http://127.0.0.1:6101/#/experiments/3/runs/ffb98098eb5744dbb8fb78388088d8e7
-    artifact_uri: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts
+    run_id: 6c798daf6a6c4616a62a2f85fc029dc0
+    experiment_id: '36'
+    experiment_url: http://127.0.0.1:6101/#/experiments/36/runs/6c798daf6a6c4616a62a2f85fc029dc0
+    artifact_uri: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts
   etcd_ip: 10.164.0.12:2379
 save_last_checkpoint_every_n_train_steps: 500
 seed: 1234
@@ -70,15 +70,15 @@ tasks:
     name: binary_text_classfication_task
     data_module:
       _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
-      batch_size: 3072
+      batch_size: 64
       shuffle: false
       num_workers: 8
       pin_memory: true
       drop_last: true
       persistent_workers: false
-      train_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/train.parquet
-      dev_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/dev.parquet
-      test_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/test.parquet
+      train_df_path: ./temp-train.parquet
+      dev_df_path: ./temp-dev.parquet
+      test_df_path: ./temp-test.parquet
       transformation:
         _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
         pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
@@ -158,17 +158,17 @@ tasks:
       precision: 16-mixed
       logger:
       - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
-        experiment_name: cybulde
+        experiment_name: test-run-cybulde
         run_name: null
         tracking_uri: http://127.0.0.1:6101
         tags: null
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: ffb98098eb5744dbb8fb78388088d8e7
+        run_id: 6c798daf6a6c4616a62a2f85fc029dc0
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/best-checkpoints/
+        dirpath: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -182,7 +182,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/last-checkpoints/
+        dirpath: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -198,14 +198,14 @@ tasks:
       - _target_: lightning.pytorch.callbacks.LearningRateMonitor
         logging_interval: step
       fast_dev_run: false
-      max_epochs: 60
+      max_epochs: 3
       min_epochs: null
       max_steps: -1
       min_steps: null
       max_time: null
-      limit_train_batches: 1.0
-      limit_val_batches: 1.0
-      limit_test_batches: 1.0
+      limit_train_batches: 0.01
+      limit_val_batches: 0.01
+      limit_test_batches: 0.01
       limit_predict_batches: 1.0
       overfit_batches: 0.0
       val_check_interval: 1.0
@@ -227,23 +227,23 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    best_training_checkpoint: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/best-checkpoints/last.ckpt
-    last_training_checkpoint: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/last-checkpoints/last.ckpt
-    tar_model_export_path: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/exported_model.tar.gz
+    best_training_checkpoint: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/best-checkpoints/last.ckpt
+    last_training_checkpoint: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/last-checkpoints/last.ckpt
+    tar_model_export_path: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/exported_model.tar.gz
   binary_text_evaluation_task:
     _target_: cybulde.evaluation.tasks.common_evaluation_task.CommonEvaluationTask
     name: binary_text_evaluation_task
     data_module:
       _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
-      batch_size: 3072
+      batch_size: 64
       shuffle: false
       num_workers: 8
       pin_memory: true
       drop_last: true
       persistent_workers: false
-      train_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/train.parquet
-      dev_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/dev.parquet
-      test_df_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/test.parquet
+      train_df_path: ./temp-train.parquet
+      dev_df_path: ./temp-dev.parquet
+      test_df_path: ./temp-test.parquet
       transformation:
         _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
         pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
@@ -262,17 +262,17 @@ tasks:
       precision: 16-mixed
       logger:
       - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
-        experiment_name: cybulde
+        experiment_name: test-run-cybulde
         run_name: null
         tracking_uri: http://127.0.0.1:6101
         tags: null
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: ffb98098eb5744dbb8fb78388088d8e7
+        run_id: 6c798daf6a6c4616a62a2f85fc029dc0
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/best-checkpoints/
+        dirpath: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -286,7 +286,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/last-checkpoints/
+        dirpath: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -302,14 +302,14 @@ tasks:
       - _target_: lightning.pytorch.callbacks.LearningRateMonitor
         logging_interval: step
       fast_dev_run: false
-      max_epochs: 60
+      max_epochs: 3
       min_epochs: null
       max_steps: -1
       min_steps: null
       max_time: null
-      limit_train_batches: 1.0
-      limit_val_batches: 1.0
-      limit_test_batches: 1.0
+      limit_train_batches: 0.01
+      limit_val_batches: 0.01
+      limit_test_batches: 0.01
       limit_predict_batches: 1.0
       overfit_batches: 0.0
       val_check_interval: 1.0
@@ -331,10 +331,86 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    tar_model_path: /mlflow-artifact-store/3/ffb98098eb5744dbb8fb78388088d8e7/artifacts/exported_model.tar.gz
+    tar_model_path: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/exported_model.tar.gz
+  classification_error_visualizer:
+    _target_: cybulde.prediction.tasks.classification_error_visualizer_prediction_task.ClassificationErrorVisualizerPredictionTask
+    name: classification_error_visualizer
+    data_module:
+      _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
+      batch_size: 64
+      shuffle: false
+      num_workers: 8
+      pin_memory: true
+      drop_last: true
+      persistent_workers: false
+      train_df_path: ./temp-train.parquet
+      dev_df_path: ./temp-dev.parquet
+      test_df_path: ./temp-test.parquet
+      transformation:
+        _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
+        pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
+        max_sequence_length: 100
+      text_column_name: cleaned_text
+      label_column_name: label
+    lightning_module:
+      _target_: cybulde.prediction.lightning_modules.binary_text_classification.BinaryTextClassificationPredictionLightningModule
+      _partial_: true
+    trainer:
+      _target_: lightning.pytorch.trainer.trainer.Trainer
+      accelerator: gpu
+      strategy: ddp_find_unused_parameters_true
+      devices: auto
+      num_nodes: 1
+      precision: 16-mixed
+      logger:
+      - _target_: lightning.pytorch.loggers.mlflow.MLFlowLogger
+        experiment_name: test-run-cybulde
+        run_name: null
+        tracking_uri: http://127.0.0.1:6101
+        tags: null
+        save_dir: null
+        prefix: ''
+        artifact_location: null
+        run_id: 6c798daf6a6c4616a62a2f85fc029dc0
+      callbacks:
+      - _target_: cybulde.utils.pl_utils.CustomPredictionWriter
+        output_dir: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/predictions/classification_error_visualizer
+      fast_dev_run: false
+      max_epochs: 4096
+      min_epochs: null
+      max_steps: -1
+      min_steps: null
+      max_time: null
+      limit_train_batches: 1.0
+      limit_val_batches: 1.0
+      limit_test_batches: 1.0
+      limit_predict_batches: 1.0
+      overfit_batches: 0.0
+      val_check_interval: 1.0
+      check_val_every_n_epoch: 1
+      num_sanity_val_steps: 2
+      log_every_n_steps: 10
+      enable_checkpointing: true
+      enable_progress_bar: true
+      enable_model_summary: true
+      accumulate_grad_batches: 1
+      gradient_clip_val: 5.0
+      gradient_clip_algorithm: value
+      deterministic: null
+      benchmark: null
+      inference_mode: true
+      use_distributed_sampler: true
+      detect_anomaly: false
+      barebones: false
+      sync_batchnorm: true
+      reload_dataloaders_every_n_epochs: 0
+      default_root_dir: ./data/pytorch-lightning
+    predictions_output_dir: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/predictions/classification_error_visualizer
+    tar_model_path: /mlflow-artifact-store/36/6c798daf6a6c4616a62a2f85fc029dc0/artifacts/exported_model.tar.gz
+    skip_special_tokens: true
 model_selector:
   _target_: cybulde.evaluation.model_selector.ModelSelector
-  mlflow_run_id: ffb98098eb5744dbb8fb78388088d8e7
+  mlflow_run_id: 6c798daf6a6c4616a62a2f85fc029dc0
   must_be_better_metric_comparers:
     f1_score:
       _target_: cybulde.evaluation.model_selector.MetricComparer
