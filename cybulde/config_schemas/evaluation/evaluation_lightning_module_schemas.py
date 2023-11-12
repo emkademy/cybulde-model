@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
 from cybulde.config_schemas.base_schemas import LightningModuleConfig
@@ -22,3 +23,12 @@ class PartialEvaluationLightningModuleConfig(EvaluationLightningModuleConfig):
 @dataclass
 class BinaryTextEvaluationLightningModuleConfig(PartialEvaluationLightningModuleConfig):
     _target_: str = "cybulde.evaluation.lightning_modules.binary_text_evaluation.BinaryTextEvaluationLightningModule"
+
+
+def setup_config() -> None:
+    cs = ConfigStore.instance()
+    cs.store(
+        name="binary_text_classification_prediction_lightning_module_schema",
+        group="tasks/lightning_module",
+        node=BinaryTextEvaluationLightningModuleConfig,
+    )

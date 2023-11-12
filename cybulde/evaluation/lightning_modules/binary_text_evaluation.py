@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+import matplotlib.pyplot as plt
 import mlflow
 import torch
 
@@ -53,6 +54,7 @@ class BinaryTextEvaluationLightningModule(EvaluationLightningModule):
         mlflow.log_figure(figure, "test_confusion_matrix.png")
 
         self.test_step_outputs = defaultdict(list)
+        plt.close()
 
     def get_transformation(self) -> Transformation:
         return self.model.get_transformation()

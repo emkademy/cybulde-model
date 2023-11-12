@@ -49,7 +49,7 @@ class DataModule(LightningDataModule):
         )
 
 
-class PartialDataModule(Protocol):
+class PartialDataModuleType(Protocol):
     def __call__(self, transformation: Transformation) -> DataModule:
         ...
 

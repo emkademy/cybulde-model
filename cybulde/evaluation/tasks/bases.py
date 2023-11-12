@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Union
 
 from lightning.pytorch import Trainer
 
-from cybulde.data_modules.data_modules import DataModule, PartialDataModule
+from cybulde.data_modules.data_modules import DataModule, PartialDataModuleType
 from cybulde.evaluation.lightning_modules.bases import EvaluationLightningModule, PartialEvaluationLightningModuleType
 from cybulde.models.common.exporter import TarModelLoader
 
@@ -16,7 +16,7 @@ class EvaluationTask(ABC):
     def __init__(
         self,
         name: str,
-        data_module: Union[DataModule, PartialDataModule],
+        data_module: Union[DataModule, PartialDataModuleType],
         lightning_module: EvaluationLightningModule,
         trainer: Trainer,
     ) -> None:
@@ -41,7 +41,7 @@ class TarModelEvaluationTask(EvaluationTask):
     def __init__(
         self,
         name: str,
-        data_module: Union[DataModule, PartialDataModule],
+        data_module: Union[DataModule, PartialDataModuleType],
         lightning_module: PartialEvaluationLightningModuleType,
         trainer: Trainer,
         tar_model_path: str,
