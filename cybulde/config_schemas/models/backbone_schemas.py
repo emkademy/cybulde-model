@@ -4,6 +4,7 @@ from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING
 
 from cybulde.config_schemas.models.transformation_schemas import (
+    BertTinyHuggingFaceTokenizationTransformationConfig,
     CustomHuggingFaceTokenizationTransformationConfig,
     TransformationConfig,
 )
@@ -32,6 +33,12 @@ class HuggingFaceBackboneConfig(BackboneConfig):
 @dataclass
 class BertTinyHuggingFaceBackboneConfig(HuggingFaceBackboneConfig):
     pretrained_model_name_or_path: str = "prajjwal1/bert-tiny"
+    transformation: TransformationConfig = BertTinyHuggingFaceTokenizationTransformationConfig()
+
+
+@dataclass
+class BertTinyWithCustomTokenizerHuggingFaceBackboneConfig(HuggingFaceBackboneConfig):
+    pretrained_model_name_or_path: str = "prajjwal1/bert-tiny"
     transformation: TransformationConfig = CustomHuggingFaceTokenizationTransformationConfig()
 
 
@@ -41,9 +48,4 @@ def setup_config() -> None:
         name="hugging_face_backbone_schema",
         group="tasks/lightning_module/model/backbone",
         node=HuggingFaceBackboneConfig,
-    )
-
-    cs.store(
-        name="test_backbone_config",
-        node=BertTinyHuggingFaceBackboneConfig,
     )

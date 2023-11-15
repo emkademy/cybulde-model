@@ -36,7 +36,7 @@ infrastructure:
         labels:
           project: cybulde
       vm_metadata_config:
-        instance_group_name: cybulde-None-20231112003247
+        instance_group_name: cybulde-None-20231113200546
         docker_image: null
         zone: europe-west4-b
         python_hash_seed: 42
@@ -44,11 +44,11 @@ infrastructure:
         node_count: 1
         disks: []
         etcd_ip: 10.164.0.12:2379
-      template_name: cybulde-None-20231112003247
+      template_name: cybulde-None-20231113200546
       project_id: cybulde
       labels:
         project: cybulde
-    name: cybulde-None-20231112003247
+    name: cybulde-None-20231113200546
     node_count: 1
     project_id: cybulde
     zone: europe-west4-b
@@ -57,10 +57,10 @@ infrastructure:
     mlflow_internal_tracking_uri: http://127.0.0.1:6101
     experiment_name: cybulde
     run_name: null
-    run_id: 78254570f7ee45f29e6e3f5593633384
+    run_id: 1f478e48c4c94c6d99697eb029f5f7e5
     experiment_id: '5'
-    experiment_url: http://127.0.0.1:6101/#/experiments/5/runs/78254570f7ee45f29e6e3f5593633384
-    artifact_uri: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts
+    experiment_url: http://127.0.0.1:6101/#/experiments/5/runs/1f478e48c4c94c6d99697eb029f5f7e5
+    artifact_uri: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts
   etcd_ip: 10.164.0.12:2379
 save_last_checkpoint_every_n_train_steps: 500
 seed: 1234
@@ -70,7 +70,7 @@ tasks:
     name: binary_text_classfication_task
     data_module:
       _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
-      batch_size: 3072
+      batch_size: 1024
       shuffle: false
       num_workers: 8
       pin_memory: true
@@ -82,7 +82,7 @@ tasks:
       transformation:
         _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
         pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
-        max_sequence_length: 100
+        max_sequence_length: 200
       text_column_name: cleaned_text
       label_column_name: label
     lightning_module:
@@ -94,7 +94,7 @@ tasks:
           transformation:
             _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
             pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
-            max_sequence_length: 100
+            max_sequence_length: 200
           pretrained_model_name_or_path: prajjwal1/bert-tiny
           pretrained: false
         adapter:
@@ -119,12 +119,12 @@ tasks:
       optimizer:
         _target_: torch.optim.AdamW
         _partial_: true
-        lr: 5.0e-05
+        lr: 1.0e-05
         betas:
         - 0.9
         - 0.999
         eps: 1.0e-08
-        weight_decay: 0.0
+        weight_decay: 0.01
         amsgrad: false
         foreach: null
         maximize: false
@@ -164,10 +164,10 @@ tasks:
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: 78254570f7ee45f29e6e3f5593633384
+        run_id: 1f478e48c4c94c6d99697eb029f5f7e5
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/best-checkpoints/
+        dirpath: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -181,7 +181,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/last-checkpoints/
+        dirpath: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -197,7 +197,7 @@ tasks:
       - _target_: lightning.pytorch.callbacks.LearningRateMonitor
         logging_interval: step
       fast_dev_run: false
-      max_epochs: 60
+      max_epochs: 20
       min_epochs: null
       max_steps: -1
       min_steps: null
@@ -226,15 +226,15 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    best_training_checkpoint: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/best-checkpoints/last.ckpt
-    last_training_checkpoint: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/last-checkpoints/last.ckpt
-    tar_model_export_path: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/exported_model.tar.gz
+    best_training_checkpoint: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/best-checkpoints/last.ckpt
+    last_training_checkpoint: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/last-checkpoints/last.ckpt
+    tar_model_export_path: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/exported_model.tar.gz
   binary_text_evaluation_task:
     _target_: cybulde.evaluation.tasks.common_evaluation_task.CommonEvaluationTask
     name: binary_text_evaluation_task
     data_module:
       _target_: cybulde.data_modules.data_modules.TextClassificationDataModule
-      batch_size: 3072
+      batch_size: 1024
       shuffle: false
       num_workers: 8
       pin_memory: true
@@ -246,7 +246,7 @@ tasks:
       transformation:
         _target_: cybulde.models.transformations.HuggingFaceTokenizationTransformation
         pretrained_tokenizer_name_or_path: gs://emkademy/cybulde/data/processed/rebalanced_splits/trained_tokenizer
-        max_sequence_length: 100
+        max_sequence_length: 200
       text_column_name: cleaned_text
       label_column_name: label
     lightning_module:
@@ -268,10 +268,10 @@ tasks:
         save_dir: null
         prefix: ''
         artifact_location: null
-        run_id: 78254570f7ee45f29e6e3f5593633384
+        run_id: 1f478e48c4c94c6d99697eb029f5f7e5
       callbacks:
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/best-checkpoints/
+        dirpath: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/best-checkpoints/
         filename: null
         monitor: validation_f1_score
         verbose: false
@@ -285,7 +285,7 @@ tasks:
         every_n_epochs: null
         save_on_train_epoch_end: null
       - _target_: lightning.pytorch.callbacks.ModelCheckpoint
-        dirpath: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/last-checkpoints/
+        dirpath: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/last-checkpoints/
         filename: checkpoint-{epoch}
         monitor: null
         verbose: false
@@ -301,7 +301,7 @@ tasks:
       - _target_: lightning.pytorch.callbacks.LearningRateMonitor
         logging_interval: step
       fast_dev_run: false
-      max_epochs: 60
+      max_epochs: 20
       min_epochs: null
       max_steps: -1
       min_steps: null
@@ -330,10 +330,10 @@ tasks:
       sync_batchnorm: true
       reload_dataloaders_every_n_epochs: 0
       default_root_dir: ./data/pytorch-lightning
-    tar_model_path: /mlflow-artifact-store/5/78254570f7ee45f29e6e3f5593633384/artifacts/exported_model.tar.gz
+    tar_model_path: /mlflow-artifact-store/5/1f478e48c4c94c6d99697eb029f5f7e5/artifacts/exported_model.tar.gz
 model_selector:
   _target_: cybulde.evaluation.model_selector.ModelSelector
-  mlflow_run_id: 78254570f7ee45f29e6e3f5593633384
+  mlflow_run_id: 1f478e48c4c94c6d99697eb029f5f7e5
   must_be_better_metric_comparers:
     f1_score:
       _target_: cybulde.evaluation.model_selector.MetricComparer

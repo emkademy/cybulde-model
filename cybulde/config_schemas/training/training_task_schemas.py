@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from hydra.core.config_store import ConfigStore
-from omegaconf import MISSING, SI
+from omegaconf import SI
 
 from cybulde.config_schemas import data_module_schemas
 from cybulde.config_schemas.base_schemas import TaskConfig
@@ -17,7 +17,7 @@ class TrainingTaskConfig(TaskConfig):
 
 @dataclass
 class TarModelExportingTrainingTaskConfig(TrainingTaskConfig):
-    tar_model_export_path: str = MISSING
+    tar_model_export_path: str = SI("${infrastructure.mlflow.artifact_uri}/exported_model.tar.gz")
 
 
 @dataclass
@@ -36,7 +36,6 @@ class DefaultCommonTrainingTaskConfig(TarModelExportingTrainingTaskConfig):
         training_lightning_module_schemas.CybuldeBinaryTextClassificationTrainingLightningModuleConfig()
     )
     trainer: trainer_schemas.TrainerConfig = trainer_schemas.GPUDev()
-    tar_model_export_path: str = SI("${infrastructure.mlflow.artifact_uri}/exported_model.tar.gz")
 
 
 def setup_config() -> None:
@@ -45,6 +44,13 @@ def setup_config() -> None:
     trainer_schemas.setup_config()
 
     cs = ConfigStore.instance()
+
+    cs.store(
+        name="tar_model_exporting_training_task_schema",
+        group="tasks",
+        node=TarModelExportingTrainingTaskConfig,
+    )
+
     cs.store(
         name="common_training_task_schema",
         group="tasks",

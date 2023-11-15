@@ -67,7 +67,7 @@ notebook: up
 
 ## Start streamlit app for error analysis
 error-analysis: up
-	$(DOCKER_COMPOSE_EXEC) streamlit run --server.port 8080 ./cybulde/error_analysis/classification_error_visualization.py
+	$(DOCKER_COMPOSE_EXEC) streamlit run --server.address 0.0.0.0 --server.port 8080 ./cybulde/error_analysis/classification_error_visualization.py
 
 ## Sort code using isort
 sort: up

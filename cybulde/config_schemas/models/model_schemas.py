@@ -31,6 +31,13 @@ class BertTinyBinaryTextClassificationModelConfig(BinaryTextClassificationModelC
     head: head_schemas.HeadConfig = head_schemas.BinaryClassificationSigmoidHead()
 
 
+@dataclass
+class CustomBertTinyBinaryTextClassificationModelConfig(BinaryTextClassificationModelConfig):
+    backbone: backbone_schemas.BackboneConfig = backbone_schemas.BertTinyWithCustomTokenizerHuggingFaceBackboneConfig()
+    adapter: Optional[adapter_schemas.AdapterConfig] = adapter_schemas.PoolerOutputAdapterConfig()
+    head: head_schemas.HeadConfig = head_schemas.BinaryClassificationSigmoidHead()
+
+
 def setup_config() -> None:
     backbone_schemas.setup_config()
     adapter_schemas.setup_config()
