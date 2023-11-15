@@ -1,8 +1,11 @@
 from typing import TYPE_CHECKING, Union
 
-from lightning.pytorch import Trainer
+import pandas as pd
 
-from cybulde.data_modules.data_modules import DataModule, PartialDataModule
+from lightning.pytorch import Trainer
+from torch import Tensor
+
+from cybulde.data_modules.data_modules import DataModule, PartialDataModuleType
 from cybulde.models.common.exporter import TarModelExporter
 from cybulde.training.lightning_modules.bases import ModelStateDictExportingTrainingLightningModule
 from cybulde.training.tasks.bases import TrainingTask
@@ -18,7 +21,7 @@ class TarModelExportingTrainingTask(TrainingTask):
     def __init__(
         self,
         name: str,
-        data_module: Union[DataModule, PartialDataModule],
+        data_module: Union[DataModule, PartialDataModuleType],
         lightning_module: ModelStateDictExportingTrainingLightningModule,
         trainer: Trainer,
         best_training_checkpoint: str,
@@ -40,6 +43,12 @@ class TarModelExportingTrainingTask(TrainingTask):
         experiment_name = config.infrastructure.mlflow.experiment_name
         run_id = config.infrastructure.mlflow.run_id
         run_name = config.infrastructure.mlflow.run_name
+
+        train_df = pd.read_parquet(task_config.data_module.train_df_path)
+        value_counts = train_df["label"].value_counts()
+        pos_weight = value_counts[0] / value_counts[1]
+
+        self.lightning_module.set_pos_weight(Tensor([pos_weight]))
 
         with activate_mlflow(experiment_name=experiment_name, run_id=run_id, run_name=run_name) as _:
             if self.trainer.is_global_zero:

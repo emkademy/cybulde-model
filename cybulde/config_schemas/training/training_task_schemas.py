@@ -17,7 +17,7 @@ class TrainingTaskConfig(TaskConfig):
 
 @dataclass
 class TarModelExportingTrainingTaskConfig(TrainingTaskConfig):
-    tar_model_export_path: str = MISSING
+    tar_model_export_path: str = SI("${infrastructure.mlflow.artifact_uri}/exported_model.tar.gz")
 
 
 @dataclass
@@ -36,7 +36,6 @@ class DefaultCommonTrainingTaskConfig(TarModelExportingTrainingTaskConfig):
         training_lightning_module_schemas.CybuldeBinaryTextClassificationTrainingLightningModuleConfig()
     )
     trainer: trainer_schemas.TrainerConfig = trainer_schemas.GPUDev()
-    tar_model_export_path: str = SI("${infrastructure.mlflow.artifact_uri}/exported_model.tar.gz")
 
 
 def setup_config() -> None:

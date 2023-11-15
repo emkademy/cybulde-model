@@ -26,7 +26,7 @@ class VMConfig:
 @dataclass
 class VMMetadataConfig:
     instance_group_name: str = SI("${infrastructure.instance_group_creator.name}")
-    docker_image: str = SI("${docker_image}")
+    docker_image: Optional[str] = SI("${docker_image}")
     zone: str = SI("${infrastructure.zone}")
     python_hash_seed: int = 42
     mlflow_tracking_uri: str = SI("${infrastructure.mlflow.mlflow_internal_tracking_uri}")

@@ -47,10 +47,10 @@ guard-%:
 
 ## Generate final config. For overrides use: OVERRIDES=<overrides>
 generate-final-config: up-prod
-	@$(DOCKER_COMPOSE_EXEC_PROD) python cybulde/generate_final_config.py infrastructure.instance_group_creator.instance_template_creator.vm_metadata_config.docker_image=${GCP_DOCKER_REGISTRY_URL}:${IMAGE_TAG} ${OVERRIDES}
+	@$(DOCKER_COMPOSE_EXEC_PROD) python cybulde/generate_final_config.py docker_image=${GCP_DOCKER_REGISTRY_URL}:${IMAGE_TAG} ${OVERRIDES}
 
 ## Generate final config local. For overrides use: OVERRIDES=<overrides>
-generate-final-config-local: up
+local-generate-final-config: up
 	@$(DOCKER_COMPOSE_EXEC) python cybulde/generate_final_config.py ${OVERRIDES}
 
 ## Local run tasks
@@ -58,7 +58,7 @@ run-tasks: generate-final-config push
 	$(DOCKER_COMPOSE_EXEC_PROD) python cybulde/launch_job_on_gcp.py
 
 ## Local run tasks
-local-run-tasks: generate-final-config-local
+local-run-tasks: local-generate-final-config
 	$(DOCKER_COMPOSE_EXEC) torchrun cybulde/run_tasks.py
 
 ## Starts jupyter lab
@@ -146,7 +146,7 @@ mlflow-ssh-tunnel:
 
 ## Clean MLFlow volumes
 clean-mlflow-volumes: down
-	docker volume rm cybulde-model_postgresql-mlflow-data cybulde-model_postgresql-optuna-data cybulde-model_mlflow-artifact-store
+	docker volume rm cybulde-model_postgresql-mlflow-data cybulde-model_mlflow-artifact-store
 
 ## Deploy etcd server on GCE
 deploy-etcd-server:

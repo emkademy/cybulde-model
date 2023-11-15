@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Union
 
 from lightning.pytorch import Trainer
 
-from cybulde.data_modules.data_modules import DataModule, PartialDataModule
+from cybulde.data_modules.data_modules import DataModule, PartialDataModuleType
 from cybulde.training.lightning_modules.bases import TrainingLightningModule
 from cybulde.utils.utils import get_logger
 
@@ -17,7 +17,7 @@ class TrainingTask(ABC):
     def __init__(
         self,
         name: str,
-        data_module: Union[DataModule, PartialDataModule],
+        data_module: Union[DataModule, PartialDataModuleType],
         lightning_module: TrainingLightningModule,
         trainer: Trainer,
         best_training_checkpoint: str,
