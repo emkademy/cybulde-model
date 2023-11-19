@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+
+import toml
+
+version = toml.load("pyproject.toml")["tool"]["poetry"]["dependencies"]["torch"]
+version = version.split("=")[-1]
+print(version)

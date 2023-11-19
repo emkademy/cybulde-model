@@ -4,27 +4,6 @@ volumes:
   postgresql-mlflow-data:
   mlflow-artifact-store:
 
-x-app-template: &APP_TEMPLATE
-  user: "${USER_ID:-1000}"
-  hostname: "${HOST_NAME:-emkademy}"
-  image: cybulde-model
-  build:
-    context: .
-    dockerfile: ./docker/Dockerfile
-    args:
-      USER_NAME: "${USER_NAME:-kyuksel}"
-      USER_ID: "${USER_ID:-1000}"
-  env_file:
-    - .envs/.postgres
-    - .envs/.mlflow-common
-    - .envs/.mlflow-dev
-  volumes:
-    - ./:/app/
-    - mlflow-artifact-store:/mlflow-artifact-store
-    - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
-  ipc: host
-  init: true
-
 services:
   mlflow-db:
     container_name: mlflow-backend-store
@@ -34,19 +13,22 @@ services:
       - .envs/.mlflow-dev
       - .envs/.postgres
     volumes:
-      - postgresql-mlflow-data:/var/lib/postgreql/data
+      - postgresql-mlflow-data:/var/lib/postgresql/data
     ports:
       - 5433:5432
     profiles:
       - dev
 
   app-dev:
-    <<: *APP_TEMPLATE
+    extends:
+      file: docker-compose-template.yaml
+      service: app
     container_name: cybulde-model-dev-container
     ports:
       - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}
       - 8080:8080
       - 8888:8888
+      - 8001:8001
     deploy:
       resources:
         reservations:
@@ -58,7 +40,9 @@ services:
       - dev
 
   app-prod:
-    <<: *APP_TEMPLATE
+    extends:
+      file: docker-compose-template.yaml
+      service: app
     container_name: cybulde-model-prod-container
     env_file:
       - .envs/.mlflow-common
@@ -70,7 +54,9 @@ services:
       - prod
 
   app-ci:
-    <<: *APP_TEMPLATE
+    extends:
+      file: docker-compose-template.yaml
+      service: app
     container_name: cybulde-model-ci-container
     ports:
       - ${LOCAL_DEV_MLFLOW_SERVER_PORT}:${LOCAL_DEV_MLFLOW_SERVER_PORT}

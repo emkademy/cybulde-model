@@ -1,0 +1,23 @@
+version: "3.8"
+
+services:
+  app:
+    user: "${USER_ID:-1000}"
+    hostname: "${HOST_NAME:-emkademy}"
+    image: cybulde-model
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        USER_NAME: "${USER_NAME:-kyuksel}"
+        USER_ID: "${USER_ID:-1000}"
+    env_file:
+      - .envs/.postgres
+      - .envs/.mlflow-common
+      - .envs/.mlflow-dev
+    volumes:
+      - ./:/app/
+      - mlflow-artifact-store:/mlflow-artifact-store
+      - ~/.config/gcloud/:/home/${USER_NAME}/.config/gcloud
+    ipc: host
+    init: true

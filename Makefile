@@ -11,6 +11,7 @@ SHELL = /usr/bin/env bash
 USER_NAME = $(shell whoami)
 USER_ID = $(shell id -u)
 HOST_NAME = $(shell hostname)
+BASE_DOCKER_IMAGE_NAME = cybulde-base
 
 ifeq (, $(shell which docker-compose))
 	DOCKER_COMPOSE_COMMAND = docker compose
@@ -108,6 +109,11 @@ build:
 build-for-dependencies:
 	rm -f *.lock
 	$(DOCKER_COMPOSE_COMMAND) build $(SERVICE_NAME)
+
+## Builds base docker image
+build-base:
+	$(eval PYTORCH_VERSION=$(shell ./scripts/utils/extract-torch-version))
+	docker build -f ./docker/base.Dockerfile -t $(BASE_DOCKER_IMAGE_NAME):$(PYTORCH_VERSION) --build-arg PYTORCH_VERSION=$(PYTORCH_VERSION) .
 
 ## Lock dependencies with poetry
 lock-dependencies: build-for-dependencies

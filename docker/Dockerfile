@@ -1,9 +1,8 @@
-FROM python:3.10-slim
+FROM cybulde-base:2.1.1
 
 ARG USER_ID
 ARG USER_NAME
-ENV HOME=/home/${USER_NAME} \
-    VIRTUAL_ENV=/home/${USER_NAME}/venv
+ENV HOME=/home/${USER_NAME}
 ENV \
   PYTHONUNBUFFERED=1 \
   DEBIAN_FRONTEND=noninteractive \
@@ -28,7 +27,7 @@ RUN addgroup --system --gid ${USER_ID} ${USER_NAME} \
 RUN chown -R ${USER_NAME}:${USER_NAME} ${HOME}
 RUN mkdir -p /app /mlflow-artifact-store "${HOME}/.local/share" && chown -R ${USER_NAME}:${USER_NAME} /app /tmp /mlflow-artifact-store "${HOME}/.local"
 
-RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.4.2
+RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.7.1
 
 USER ${USER_NAME}
 
@@ -36,7 +35,6 @@ COPY pyproject.toml *.lock /app/
 WORKDIR /app
 
 RUN poetry config virtualenvs.create false \
-    && python3.10 -m venv ${VIRTUAL_ENV} \
     && pip install --upgrade pip setuptools \
     && poetry install && cp poetry.lock ${BUILD_POETRY_LOCK} \
     && rm -rf ${HOME}/.cache/*

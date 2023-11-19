@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Optional, Union
 import hydra
 import yaml
 
+from hydra import compose, initialize
 from hydra.types import TaskFunction
 from omegaconf import DictConfig, OmegaConf
 
@@ -101,3 +102,15 @@ def load_config_header() -> str:
 
     with open(config_header_path, "r") as f:
         return f.read()
+
+
+def load_config(config_path: str, config_name: str, overrides: Optional[list[str]] = None) -> Any:
+    setup_config()
+    setup_logger()
+
+    if overrides is None:
+        overrides = []
+
+    with initialize(version_base=None, config_path=config_path, job_name="config-compose"):
+        config = compose(config_name=config_name, overrides=overrides)
+    return config
